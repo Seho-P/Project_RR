@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 112fc39bef6563e40917c58aba4c8f29, type: 3}
   m_Name: SwordSectorArea
   m_EditorClassIdentifier: 
-  angle: 150
+  angle: 120
+  edgeTolerance: 0.05

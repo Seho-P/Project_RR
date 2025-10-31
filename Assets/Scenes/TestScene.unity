@@ -223,7 +223,7 @@ MonoBehaviour:
   damage: 50
   cooldown: 0.4
   range: 1.2
-  hitRadius: 3
+  hitRadius: 2
   hitMask:
     serializedVersion: 2
     m_Bits: 128
