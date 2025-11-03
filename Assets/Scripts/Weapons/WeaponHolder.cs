@@ -4,6 +4,7 @@ public class WeaponHolder : MonoBehaviour
 {
     [SerializeField] private Transform firePoint;
     [SerializeField] private MonoBehaviour initialWeapon;
+    [SerializeField] private Animator animator;
 
     private IWeapon currentWeapon;
 
@@ -27,7 +28,21 @@ public class WeaponHolder : MonoBehaviour
     {
         if (!IsWeaponAlive(currentWeapon)) return;
         if (!currentWeapon.CanAttack()) return;
+        if (animator != null)
+        {
+            animator.SetTrigger("Attack");
+        }
         currentWeapon.Attack(targetWorld);
+    }
+
+    // Animation Event에서 호출할 수 있는 공통 훅
+    public void OnAnimEvent(string evt)
+    {
+        if (!IsWeaponAlive(currentWeapon)) return;
+        if (currentWeapon is IAnimEventWeapon animEventWeapon)
+        {
+            animEventWeapon.OnAnimEvent(evt);
+        }
     }
 
     private bool IsWeaponAlive(IWeapon weapon)
