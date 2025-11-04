@@ -24,6 +24,14 @@ public class SwordWeapon : MeleeWeaponBase
         cooldown = prevCooldown;
         range = prevRange;
     }
+    //무기말고 holder에서 처리
+    // public override void OnAnimEvent(string evt)
+    // {
+    //     if (evt == "Attack")
+    //     {
+    //         Attack(targetWorldPosition);
+    //     }
+    // }
 }
 
 
