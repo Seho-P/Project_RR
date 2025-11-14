@@ -43,8 +43,10 @@ public class PlayerController : MonoBehaviour
 
     private void RotateToMouse()
     {
+        if (weaponHolder == null) return;
+
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 dir = (mouseWorld - transform.position);
+        Vector2 dir = (mouseWorld - weaponHolder.FirePoint.position);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
     }

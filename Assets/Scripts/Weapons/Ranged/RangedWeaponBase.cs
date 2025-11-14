@@ -10,11 +10,11 @@ public class RangedWeaponBase : MonoBehaviour, IWeapon
 
     [Header("Refs")]
     [SerializeField] protected Transform firePoint;
-
+    [SerializeField] protected AnimatorOverrideController animatorOverrideController;
     protected float nextAttackTime;
 
     public Transform FirePoint => firePoint;
-
+    public AnimatorOverrideController AnimatorOverrideController => animatorOverrideController;
     protected virtual void Awake()
     {
         if (firePoint == null) firePoint = transform;

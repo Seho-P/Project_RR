@@ -6,7 +6,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: testSword
+  m_Name: BaseWeaponController
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: Attack
@@ -99,7 +99,7 @@ AnimatorStateTransition:
   m_ExitTime: 0.05
   m_HasExitTime: 1
   m_HasFixedDuration: 1
-  m_InterruptionSource: 0
+  m_InterruptionSource: 2
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
 --- !u!1101 &7116752230048941342
@@ -148,7 +148,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 3680a8cd0c5efd84d91759ad2873364d, type: 2}
+  m_Motion: {fileID: 7400000, guid: 4c276ffe41fb66c44a784cbdcbaa5856, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
