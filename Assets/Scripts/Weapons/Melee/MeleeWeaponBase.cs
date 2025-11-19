@@ -64,6 +64,9 @@ public abstract class MeleeWeaponBase : MonoBehaviour, IWeapon
     {
         Vector2 origin = (firePoint != null ? (Vector2)firePoint.position : (Vector2)transform.position);
         Vector2 mouse = Camera.main != null ? (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) : origin + Vector2.right;
+        if(gizmoPreviewTarget != null){
+            mouse = gizmoPreviewTarget.position;
+        }
         Vector2 dir = (mouse - origin).normalized;
         Vector2 center = origin + dir.normalized * (range * 0.5f);
 		if (attackArea != null)

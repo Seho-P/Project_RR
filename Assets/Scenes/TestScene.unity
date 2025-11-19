@@ -1657,6 +1657,10 @@ PrefabInstance:
       propertyPath: firePoint
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7447814576019598766, guid: 95a6ca1ffe21e554f86ccdeb2e19ed50, type: 3}
+      propertyPath: gizmoPreviewTarget
+      value: 
+      objectReference: {fileID: 555264151}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
