@@ -12,6 +12,8 @@ public abstract class MeleeWeaponBase : MonoBehaviour, IWeapon
 	[Header("Attack Area")]
 	[SerializeField] private AttackAreaBase attackArea;
 
+    [SerializeField] private Transform gizmoPreviewTarget;
+
     [Header("Refs")]
     [SerializeField] protected Transform firePoint;
     [SerializeField] protected AnimatorOverrideController animatorOverrideController;
@@ -36,15 +38,16 @@ public abstract class MeleeWeaponBase : MonoBehaviour, IWeapon
 
         Vector2 origin = (firePoint != null ? (Vector2)firePoint.position : (Vector2)transform.position);
         Vector2 direction = (targetWorldPosition - origin).normalized;
+        Vector2 center = origin + direction.normalized * (range * 0.5f);
 
 		Collider2D[] hits;
 		if (attackArea != null)
 		{
-			hits = attackArea.FindTargets(origin, direction, hitMask, range, hitRadius);
+			hits = attackArea.FindTargets(center, direction, hitMask, range, hitRadius);
 		}
 		else
 		{
-			hits = Physics2D.OverlapCircleAll(origin, hitRadius, hitMask);
+			hits = Physics2D.OverlapCircleAll(center, hitRadius, hitMask);
 		}
 
 		for (int i = 0; i < hits.Length; i++)
@@ -61,15 +64,19 @@ public abstract class MeleeWeaponBase : MonoBehaviour, IWeapon
     {
         Vector2 origin = (firePoint != null ? (Vector2)firePoint.position : (Vector2)transform.position);
         Vector2 mouse = Camera.main != null ? (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) : origin + Vector2.right;
+        if(gizmoPreviewTarget != null){
+            mouse = gizmoPreviewTarget.position;
+        }
         Vector2 dir = (mouse - origin).normalized;
+        Vector2 center = origin + dir.normalized * (range * 0.5f);
 		if (attackArea != null)
 		{
-			attackArea.DrawGizmos(origin, dir, range, hitRadius, Color.red);
+			attackArea.DrawGizmos(center, dir, range, hitRadius, Color.red);
 		}
 		else
 		{
 			Gizmos.color = Color.red;
-			Gizmos.DrawWireSphere(origin, hitRadius);
+			Gizmos.DrawWireSphere(center, hitRadius);
 		}
     }
 }
