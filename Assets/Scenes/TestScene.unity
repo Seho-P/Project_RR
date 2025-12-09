@@ -627,7 +627,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3bf4226703ba5e4389688a6533c9f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  moveSpeed: 5
   dodgeDistance: 3
   dodgeDuration: 0.3
   invincibilityDuration: 0.5
