@@ -20,9 +20,11 @@ public class EnemyController : MonoBehaviour
     [Header("Combat")]
     [SerializeField] private float attackCooldown = 0.5f;
     [SerializeField] private WeaponHolder weaponHolder;
+    [SerializeField] private HealthBar healthBar;
 
     private Rigidbody2D rb;
     private Transform currentTarget;
+    private Health health;
 
     private EnemyIdleState idleState;
     private EnemyChaseState chaseState;
@@ -51,6 +53,9 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
+        health = GetComponent<Health>();
+        healthBar.Initialize(health);
+
         if (autoFindTargetByTag && currentTarget == null && !string.IsNullOrEmpty(targetTag))
         {
             GameObject targetObj = GameObject.FindGameObjectWithTag(targetTag);
@@ -181,6 +186,7 @@ public class EnemyController : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, maxChaseRange);
     }
+    
 }
 
 

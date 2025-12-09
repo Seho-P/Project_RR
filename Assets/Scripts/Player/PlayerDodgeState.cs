@@ -76,6 +76,9 @@ public class PlayerDodgeState : PlayerState
 
         // 최종 위치 보정
         controller.Rigidbody.MovePosition(targetPos);
+        // 이동 방향 및 속도 초기화 (추가 움직임 방지)
+        controller.SetMoveDirection(Vector2.zero);
+        controller.Rigidbody.linearVelocity = Vector2.zero;
 
         // 무적 지속 시간이 회피 시간보다 길면 추가로 대기
         if (invincibilityDuration > dodgeDuration)
