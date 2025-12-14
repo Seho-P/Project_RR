@@ -20,9 +20,11 @@ public class EnemyController : MonoBehaviour
     [Header("Combat")]
     [SerializeField] private float attackCooldown = 0.5f;
     [SerializeField] private WeaponHolder weaponHolder;
+    [SerializeField] private HealthBar healthBar;
 
     private Rigidbody2D rb;
     private Transform currentTarget;
+    private Health health;
 
     private EnemyIdleState idleState;
     private EnemyChaseState chaseState;
@@ -51,6 +53,9 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
+        health = GetComponent<Health>();
+        healthBar.Initialize(health);
+
         if (autoFindTargetByTag && currentTarget == null && !string.IsNullOrEmpty(targetTag))
         {
             GameObject targetObj = GameObject.FindGameObjectWithTag(targetTag);
@@ -152,22 +157,44 @@ public class EnemyController : MonoBehaviour
     public void FaceTarget()
     {
         if (!HasTarget) return;
-        Vector2 dir = ((Vector2)currentTarget.position - rb.position).normalized;
-        if (dir.x > 0.01f)
-        {
-            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
-        else if (dir.x < -0.01f)
-        {
-            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
+        Vector2 dir = (currentTarget.position - weaponHolder.FirePoint.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    public bool TryAttack()
+     public bool TryAttack()
     {
         if (weaponHolder == null || currentTarget == null) return false;
         weaponHolder.Attack(currentTarget.position);
         return true;
+    }
+
+    public bool TryAttackAtPosition(Vector2 targetPosition)
+    {
+        if (weaponHolder == null) return false;
+        weaponHolder.Attack(targetPosition);
+        return true;
+    }
+
+    // 코루틴 실행을 위한 헬퍼 메서드
+    public Coroutine StartCoroutineFromState(System.Collections.IEnumerator coroutine)
+    {
+        return StartCoroutine(coroutine);
+    }
+
+    public bool IsWeaponOnCooldown()
+    {
+        if (weaponHolder == null) return false;
+        // WeaponHolder의 무기 쿨타임 확인을 위해 리플렉션 사용
+        var weaponField = typeof(WeaponHolder).GetField("currentWeapon", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (weaponField == null) return false;
+        
+        var weapon = weaponField.GetValue(weaponHolder) as IWeapon;
+        if (weapon == null) return false;
+        
+        // CanAttack()이 false면 쿨타임 중
+        return !weapon.CanAttack();
     }
 
     private void OnDrawGizmosSelected()
@@ -181,6 +208,7 @@ public class EnemyController : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, maxChaseRange);
     }
+    
 }
 
 
