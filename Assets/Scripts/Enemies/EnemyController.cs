@@ -157,7 +157,7 @@ public class EnemyController : MonoBehaviour
     public void FaceTarget()
     {
         if (!HasTarget) return;
-        Vector2 dir = ((Vector2)currentTarget.position - rb.position).normalized;
+        Vector2 dir = (currentTarget.position - weaponHolder.FirePoint.position).normalized;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
     }
