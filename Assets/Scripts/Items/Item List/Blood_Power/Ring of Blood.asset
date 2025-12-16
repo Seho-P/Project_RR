@@ -10,14 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d60905340049684494acdf2789613bd, type: 3}
-  m_Name: Test Item
+  m_Name: Ring of Blood
   m_EditorClassIdentifier: Assembly-CSharp::Items.Data.ItemData
-  itemId: 005
-  itemName: test
-  description: test
+  itemId: 003
+  itemName: "\uC0AC\uD608\uC758 \uBC18\uC9C0"
+  description: "\uD53C\uAC00 \uB69D\uB69D \uB5A8\uC5B4\uC9C0\uB294 \uB290\uB08C\uC774\uB2E4."
   itemIcon: {fileID: 0}
-  itemType: 0
+  itemType: 1
   rarity: 0
-  baseStats: []
-  setName: 
-  setPieceNumber: 0
+  baseStats:
+  - statType: 1
+    flatBonus: 1
+    percentageBonus: 0
+  setName: "\uD53C\uC758 \uBD84\uB178"
+  setPieceNumber: 3
