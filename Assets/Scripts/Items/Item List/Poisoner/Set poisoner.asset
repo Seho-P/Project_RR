@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f59c33992fa35e247af0fcebd9600cec, type: 3}
+  m_Name: Set poisoner
+  m_EditorClassIdentifier: Assembly-CSharp::Items.Data.SetItemData
+  setName: "\uB3C5\uC778"
+  setDescription: "\uC8FC\uBCC0\uC73C\uB85C \uB3C5 \uBC29\uCD9C \uBC0F \uC911\uB3C5
+    \uCEE8\uC149"
+  totalPieces: 4
+  setBonuses: []
