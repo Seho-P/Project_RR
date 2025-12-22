@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f59c33992fa35e247af0fcebd9600cec, type: 3}
   m_Name: Test Set item
   m_EditorClassIdentifier: Assembly-CSharp::Items.Data.SetItemData
-  setName: 
-  setDescription: 
-  totalPieces: 0
+  setName: "\uD654\uC0C1"
+  setDescription: "\uB728\uAC81\uB2E4"
+  totalPieces: 4
   setBonuses: []
