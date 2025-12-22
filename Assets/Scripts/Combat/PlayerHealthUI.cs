@@ -3,34 +3,36 @@ using UnityEngine.UI;
 
 public class PlayerHealthUI : MonoBehaviour
 {
-    [SerializeField] private Health playerhealth;
     [SerializeField] private Slider healthBar;
+    
+    private Health playerHealth;
 
-    private void Awake()
+    private void Start()
     {
-        if (playerhealth == null)
+        // 플레이어의 Health 컴포넌트 찾기
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
         {
-            playerhealth = GetComponent<Health>();
-        }
-        if (healthBar == null)
-        {
-            healthBar = GetComponent<Slider>();
+            playerHealth = player.GetComponent<Health>();
+            if (playerHealth != null)
+            {
+                healthBar.maxValue = playerHealth.MaxHealth;
+                healthBar.value = playerHealth.CurrentHealth;
+                playerHealth.OnHealthChanged += UpdateHPUI;
+            }
         }
     }
 
-    private void Start(){
-        healthBar.maxValue = playerhealth.MaxHealth;
-        healthBar.value = playerhealth.CurrentHealth;
-
-        playerhealth.OnHealthChanged += UpdateHPUI;
-    }
-
-    public void OnDestroy()
+    private void OnDestroy()
     {
-        playerhealth.OnHealthChanged -= UpdateHPUI;
+        if (playerHealth != null)
+        {
+            playerHealth.OnHealthChanged -= UpdateHPUI;
+        }
     }
 
-    private void UpdateHPUI(float currentHealth, float maxHealth){
+    private void UpdateHPUI(float currentHealth, float maxHealth)
+    {
         healthBar.value = currentHealth;
     }
 }
