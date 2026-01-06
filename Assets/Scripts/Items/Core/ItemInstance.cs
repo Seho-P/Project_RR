@@ -3,8 +3,7 @@ using UnityEngine;
 using Items.Enums;
 using Items.Data;
 
-namespace Items.Data
-{
+
     [System.Serializable]
     public class ItemInstance
 {
@@ -126,5 +125,4 @@ namespace Items.Data
         return bonuses;
     }
     }
-}
 
