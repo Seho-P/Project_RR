@@ -28,6 +28,30 @@ public class Inventory : MonoBehaviour
             items.Add(null);
         }
     }
+        private void Start()
+    {
+        // ItemEvents 구독
+        ItemEvents.OnItemEquipped += HandleItemEquipped;
+        ItemEvents.OnItemUnequipped += HandleItemUnequipped;
+    }
+
+    private void OnDestroy()
+    {
+        // 이벤트 구독 해제
+        ItemEvents.OnItemEquipped -= HandleItemEquipped;
+        ItemEvents.OnItemUnequipped -= HandleItemUnequipped;
+    }
+        private void HandleItemEquipped(ItemInstance item)
+    {
+        // 장착된 아이템을 인벤토리에 추가
+        AddItem(item);
+    }
+
+    private void HandleItemUnequipped(ItemInstance item)
+    {
+        // 해제된 아이템을 인벤토리에서 제거
+        RemoveItem(item);
+    }
 
     /// <summary>
     /// 아이템 추가 (빈 슬롯에 자동 배치)
