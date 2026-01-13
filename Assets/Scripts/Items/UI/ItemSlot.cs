@@ -207,6 +207,11 @@ public class ItemSlot : MonoBehaviour
             slotButton.interactable = interactable;
     }
 
+    public void SetActive(bool active)
+    {
+        gameObject.SetActive(active);
+    }
+
     // 프로퍼티
     public ItemInstance CurrentItem => currentItem;
     public int SlotIndex => slotIndex;

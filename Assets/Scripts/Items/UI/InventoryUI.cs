@@ -92,6 +92,7 @@ public class InventoryUI : MonoBehaviour
         for (int i = 0; i < slotCount; i++)
         {
             ItemSlot slot = Instantiate(slotPrefab, slotContainer);
+            slot.SetActive(true);
             slot.name = $"Slot_{i}";
             slot.SetItem(null, i);
 
