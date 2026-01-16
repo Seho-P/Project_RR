@@ -114,6 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 121ec3ec54e50034a8fcf47666e12035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
+  addressableKey: InventoryPanel
   inventory: {fileID: 0}
   slotPrefab: {fileID: 7828241528663481232}
   slotContainer: {fileID: 4751175299789464511}
