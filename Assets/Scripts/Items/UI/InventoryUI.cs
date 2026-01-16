@@ -1,14 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using Cysharp.Threading.Tasks;
 using Items.Data;
 
 /// <summary>
 /// 인벤토리 UI 관리 클래스
-/// 슬롯들을 생성하고 관리
+/// 슬롯들을 생성하고 관리하며, 자신의 생명주기를 관리
 /// </summary>
 public class InventoryUI : MonoBehaviour
 {
+    private static InventoryUI instance;
+    public static InventoryUI Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                // UIManager를 통해 로드하거나 직접 찾기
+                instance = FindFirstObjectByType<InventoryUI>();
+            }
+            return instance;
+        }
+    }
+
+
     [Header("References")]
     [SerializeField] private Inventory inventory;
     [SerializeField] private ItemSlot slotPrefab; // 슬롯 프리팹
@@ -20,9 +38,23 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private int slotsPerRow = 6; // 한 줄에 표시할 슬롯 수
 
     private List<ItemSlot> slots = new List<ItemSlot>();
+    // private GameObject loadedGameObject;
+    private bool isInitialized = false;
 
     private void Awake()
     {
+        // 싱글톤 인스턴스 설정
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Debug.LogWarning("InventoryUI: 중복된 인스턴스가 감지되었습니다. 기존 인스턴스를 사용합니다.");
+            Destroy(gameObject);
+            return;
+        }
+
         if (inventory == null)
             inventory = FindFirstObjectByType<Inventory>();
 
@@ -43,28 +75,16 @@ public class InventoryUI : MonoBehaviour
 
     private void Start()
     {
-        if (createSlotsOnStart)
-        {
-            CreateSlots();
-        }
+        // 이미 초기화되었으면 스킵 (Load()에서 이미 초기화됨)
+        if (isInitialized) return;
 
-        if (inventory != null)
-        {
-            // 인벤토리 이벤트 구독
-            inventory.OnItemAdded += OnInventoryItemAdded;
-            inventory.OnItemRemoved += OnInventoryItemRemoved;
-            inventory.OnItemChanged += OnInventoryItemChanged;
-        }
+        // 씬에 직접 배치된 경우 자동 초기화
+        Initialize();
     }
 
     private void OnDestroy()
     {
-        if (inventory != null)
-        {
-            inventory.OnItemAdded -= OnInventoryItemAdded;
-            inventory.OnItemRemoved -= OnInventoryItemRemoved;
-            inventory.OnItemChanged -= OnInventoryItemChanged;
-        }
+        Unload();
     }
 
     /// <summary>
@@ -210,11 +230,77 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 인벤토리 UI 표시/숨기기
+    /// 인벤토리 UI 로드 (어드레서블) uimanger에서 로드하게 변경되면서 필요없어짐
     /// </summary>
-    public void SetVisible(bool visible)
+    // public async UniTask<InventoryUI> Load(string addressableKey)
+    // {
+    //     var canvas = UIManager.Instance?.GetCanvas();
+    //     if (canvas == null)
+    //     {
+    //         Debug.LogError("InventoryUI: UIManager의 Canvas를 찾을 수 없습니다.");
+    //         return null;
+    //     }
+
+    //     loadedGameObject = await Addressables.InstantiateAsync(addressableKey, canvas.transform).ToUniTask();
+    //     var ui = loadedGameObject.GetComponent<InventoryUI>();
+    //     if (ui != null)
+    //     {
+    //         ui.Initialize();
+    //     }
+    //     return ui;
+    // }
+
+    /// <summary>
+    /// 초기화 (로드 후 호출)
+    /// </summary>
+    public void Initialize()
     {
-        gameObject.SetActive(visible);
+        if (isInitialized) return;
+
+        // Inventory 찾기
+        if (inventory == null)
+            inventory = FindFirstObjectByType<Inventory>();
+
+        // 슬롯 생성
+        if (createSlotsOnStart)
+        {
+            CreateSlots();
+        }
+
+        // 이벤트 구독
+        if (inventory != null)
+        {
+            inventory.OnItemAdded += OnInventoryItemAdded;
+            inventory.OnItemRemoved += OnInventoryItemRemoved;
+            inventory.OnItemChanged += OnInventoryItemChanged;
+        }
+
+        isInitialized = true;
+    }
+
+    /// <summary>
+    /// 인벤토리 UI 언로드 (이벤트 정리 및 슬롯 정리만 수행)
+    /// Addressables 해제는 UIManager에서 관리
+    /// </summary>
+    public void Unload()
+    {
+        // 이벤트 구독 해제
+        if (inventory != null)
+        {
+            inventory.OnItemAdded -= OnInventoryItemAdded;
+            inventory.OnItemRemoved -= OnInventoryItemRemoved;
+            inventory.OnItemChanged -= OnInventoryItemChanged;
+        }
+
+        // 슬롯 정리
+        ClearSlots();
+
+        // 어드레서블 리소스 해제는 UIManager에서 관리하므로 여기서는 하지 않음
+        // UIManager에서 ReleaseInventoryUI()를 호출하면 Addressables.ReleaseInstance가 호출됨
+        // loadedGameObject = null;
+
+        instance = null;
+        isInitialized = false;
     }
 
     /// <summary>
@@ -222,7 +308,42 @@ public class InventoryUI : MonoBehaviour
     /// </summary>
     public void Toggle()
     {
-        SetVisible(!gameObject.activeSelf);
+        if (instance == null || !instance.gameObject.activeSelf)
+            gameObject.SetActive(true);
+        else
+            gameObject.SetActive(false);
+    }
+
+
+
+    /// <summary>
+    /// Inventory 참조 설정 (어드레서블 로드 시 사용)
+    /// </summary>
+    public void SetInventory(Inventory inv)
+    {
+        // 기존 이벤트 구독 해제
+        if (inventory != null)
+        {
+            inventory.OnItemAdded -= OnInventoryItemAdded;
+            inventory.OnItemRemoved -= OnInventoryItemRemoved;
+            inventory.OnItemChanged -= OnInventoryItemChanged;
+        }
+
+        inventory = inv;
+
+        // 새 인벤토리 이벤트 구독
+        if (inventory != null)
+        {
+            inventory.OnItemAdded += OnInventoryItemAdded;
+            inventory.OnItemRemoved += OnInventoryItemRemoved;
+            inventory.OnItemChanged += OnInventoryItemChanged;
+
+            // 슬롯이 이미 생성되어 있다면 새로고침
+            if (slots.Count > 0)
+            {
+                RefreshAllSlots();
+            }
+        }
     }
 
     // 프로퍼티

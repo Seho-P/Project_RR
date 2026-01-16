@@ -72,6 +72,12 @@ public class PlayerController : MonoBehaviour
     {
         currentState?.Tick();
         RotateToMouse();
+        
+        // 인벤토리 입력 처리 (상태와 무관하게 항상 처리)
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            UIManager.Instance?.ToggleUI<InventoryUI>("InventoryPanel");
+        }
     }
 
     private void FixedUpdate()

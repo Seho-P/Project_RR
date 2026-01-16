@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Items.Data;
 using Items.Events;
+using System;
 
 /// <summary>
 /// 레벨업 UI 관리 클래스
@@ -13,6 +14,7 @@ public class LevelUpUI : MonoBehaviour
     [Header("References")]
     [SerializeField] private ItemSlot slotPrefab; // 슬롯 프리팹
     [SerializeField] private Transform slotContainer; // 슬롯들이 배치될 부모 오브젝트 (중심점)
+    [SerializeField] private Button closeButton;
 
     [Header("Pentagon Layout Settings")]
     [SerializeField] private float radius = 200f; // 중심에서 슬롯까지의 거리
@@ -21,17 +23,21 @@ public class LevelUpUI : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private bool createSlotsOnStart = true;
-    [SerializeField] private bool hideOnStart = true; // 시작 시 숨김
 
     private List<ItemSlot> slots = new List<ItemSlot>();
+
+    public event Action<LevelUpUI> OnLevelUpCompleted;
 
     private void Awake()
     {
         if (slotContainer == null)
             slotContainer = transform;
 
-        if (hideOnStart)
-            gameObject.SetActive(false);
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(OnCloseButtonClicked);
+        }
+
     }
 
     private void Start()
@@ -40,18 +46,22 @@ public class LevelUpUI : MonoBehaviour
         {
             CreateSlots();
         }
-
-        // 레벨업 이벤트 구독
-        PlayerLevelEvents.OnLevelUp += OnLevelUp;
     }
 
     private void OnDestroy()
     {
-        // 이벤트 구독 해제
-        PlayerLevelEvents.OnLevelUp -= OnLevelUp;
+        if (closeButton != null)
+        {
+            closeButton.onClick.RemoveListener(OnCloseButtonClicked);
+        }
 
         // 슬롯 정리
         ClearSlots();
+    }
+
+    private void OnCloseButtonClicked()
+    {
+        OnLevelUpCompleted?.Invoke(this);
     }
 
     /// <summary>
@@ -85,6 +95,7 @@ public class LevelUpUI : MonoBehaviour
 
             // 슬롯 생성
             ItemSlot slot = Instantiate(slotPrefab, slotContainer);
+            slot.SetActive(true);
             slot.name = $"LevelUpSlot_{i}";
             
             // RectTransform을 사용하여 위치 설정
@@ -162,6 +173,8 @@ public class LevelUpUI : MonoBehaviour
         
         // 여기에 아이템 선택 로직 추가
         // 예: OnItemSelected?.Invoke(item);
+
+        // OnCompleted?.Invoke(this);
         
         // 선택 후 UI 숨기기 (필요시)
         // Hide();
@@ -178,14 +191,6 @@ public class LevelUpUI : MonoBehaviour
         Debug.Log($"레벨업 아이템 우클릭: {item.ItemData.itemName} (슬롯 {slot.SlotIndex})");
     }
 
-    /// <summary>
-    /// 레벨업 이벤트 처리
-    /// </summary>
-    private void OnLevelUp(int newLevel)
-    {
-        // 레벨업 시 UI 표시 (나중에 아이템 로직 추가 시 사용)
-        // Show();
-    }
 
     /// <summary>
     /// 모든 슬롯 제거
@@ -204,37 +209,7 @@ public class LevelUpUI : MonoBehaviour
         slots.Clear();
     }
 
-    /// <summary>
-    /// 레벨업 UI 표시/숨기기
-    /// </summary>
-    public void SetVisible(bool visible)
-    {
-        gameObject.SetActive(visible);
-    }
-
-    /// <summary>
-    /// 레벨업 UI 표시
-    /// </summary>
-    public void Show()
-    {
-        SetVisible(true);
-    }
-
-    /// <summary>
-    /// 레벨업 UI 숨기기
-    /// </summary>
-    public void Hide()
-    {
-        SetVisible(false);
-    }
-
-    /// <summary>
-    /// 레벨업 UI 토글
-    /// </summary>
-    public void Toggle()
-    {
-        SetVisible(!gameObject.activeSelf);
-    }
+    
 
     // 프로퍼티
     public List<ItemSlot> Slots => slots;
