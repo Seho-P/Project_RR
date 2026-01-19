@@ -18,6 +18,9 @@ MonoBehaviour:
   itemIcon: {fileID: 0}
   itemType: 0
   rarity: 0
-  baseStats: []
+  baseStats:
+  - statType: 0
+    flatBonus: 0
+    percentageBonus: 0
   setName: 
   setPieceNumber: 0

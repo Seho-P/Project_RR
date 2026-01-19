@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UI_Popup
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: UI_Popup
+  m_GUID: 451654d71c0292a45861dfa97b3204d9
+  m_SerializeEntries:
+  - m_GUID: 40c49ed3732a0894e99fda78f4e28abe
+    m_Address: InventoryPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Popup
+    - UI
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abf576685403d214f8cd62390cde6864
+    m_Address: LevelUpPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Popup
+    - UI
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: df196c5c1bbbd7145befe36061e8237a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 43799d323a0696d41ba639e067637d0e, type: 2}
+    - {fileID: 11400000, guid: 8b3f98a4b738c73419ad5f76db749579, type: 2}
