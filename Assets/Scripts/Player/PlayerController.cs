@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviour
 
     private void RotateToMouse()
     {
-        if (weaponHolder == null) return;
+        if (weaponHolder == null || Time.timeScale <= 0f) return;
 
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 dir = (mouseWorld - weaponHolder.FirePoint.position);
