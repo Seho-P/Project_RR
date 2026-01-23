@@ -1,0 +1,434 @@
+fileFormatVersion: 2
+guid: 3a48121bc02e78e44a0f62e7166e64b7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6184908811431142540
+    second: item image list 01_0
+  - first:
+      213: -7801769397820123551
+    second: item image list 01_1
+  - first:
+      213: 2354283900930154729
+    second: item image list 01_2
+  - first:
+      213: -4862880570105916652
+    second: item image list 01_3
+  - first:
+      213: -6645236715615724399
+    second: item image list 01_4
+  - first:
+      213: 3026934993862161692
+    second: item image list 01_5
+  - first:
+      213: 2379743562754008992
+    second: item image list 01_6
+  - first:
+      213: -3211295145723502809
+    second: item image list 01_7
+  - first:
+      213: 6025297544074570239
+    second: item image list 01_8
+  - first:
+      213: -522461069124378
+    second: item image list 01_9
+  - first:
+      213: -3277641841331899578
+    second: item image list 01_10
+  - first:
+      213: -8269802764177464816
+    second: item image list 01_11
+  - first:
+      213: 4187875181828516392
+    second: item image list 01_12
+  - first:
+      213: -258353408006799631
+    second: item image list 01_13
+  - first:
+      213: 1212029162201978487
+    second: item image list 01_14
+  - first:
+      213: -1345481466783675261
+    second: item image list 01_15
+  - first:
+      213: -7467906776853470817
+    second: item image list 01_16
+  - first:
+      213: -321745716072584690
+    second: item image list 01_17
+  - first:
+      213: 5905209954116787573
+    second: item image list 01_18
+  - first:
+      213: 1511598575175824766
+    second: item image list 01_19
+  - first:
+      213: 3636907847948021649
+    second: item image list 01_20
+  - first:
+      213: 5476686168598219827
+    second: item image list 01_21
+  - first:
+      213: 1230567235006579734
+    second: item image list 01_22
+  - first:
+      213: 8965685055537701734
+    second: item image list 01_23
+  - first:
+      213: 1929911130233237438
+    second: item image list 01_24
+  - first:
+      213: 1902777873086706218
+    second: item image list 01_25
+  - first:
+      213: -8600873187053627811
+    second: item image list 01_26
+  - first:
+      213: 8974078642439559634
+    second: item image list 01_27
+  - first:
+      213: -7794963059585232533
+    second: item image list 01_28
+  - first:
+      213: 8438537412574742186
+    second: item image list 01_29
+  - first:
+      213: -1309315528346554063
+    second: item image list 01_30
+  - first:
+      213: -324699486839499740
+    second: item image list 01_31
+  - first:
+      213: 4674036038409048528
+    second: item image list 01_32
+  - first:
+      213: -7904351994958640253
+    second: item image list 01_33
+  - first:
+      213: 9016658951453591632
+    second: item image list 01_34
+  - first:
+      213: -4131883109067540181
+    second: item image list 01_35
+  - first:
+      213: -4412482069088926607
+    second: item image list 01_36
+  - first:
+      213: -4372724141259746173
+    second: item image list 01_37
+  - first:
+      213: 3293373806956743101
+    second: item image list 01_38
+  - first:
+      213: 8239023955740429471
+    second: item image list 01_39
+  - first:
+      213: -5814008481432345746
+    second: item image list 01_40
+  - first:
+      213: 815460046620550841
+    second: item image list 01_41
+  - first:
+      213: 4395771864033953362
+    second: item image list 01_42
+  - first:
+      213: 7610270146880520511
+    second: item image list 01_43
+  - first:
+      213: 7472653068197047606
+    second: item image list 01_44
+  - first:
+      213: -4625291514974041405
+    second: item image list 01_45
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: item image list 01_0
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 540
+        width: 362
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47b967e743aca2aa0800000000000000
+      internalID: -6184908811431142540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: item image list 01_1
+      rect:
+        serializedVersion: 2
+        x: 868
+        y: 526
+        width: 289
+        height: 295
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1661b67711c8ab390800000000000000
+      internalID: -7801769397820123551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: item image list 01_7
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 224
+        width: 257
+        height: 164
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72fd63244103f63d0800000000000000
+      internalID: -3211295145723502809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: item image list 01_14
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 535
+        width: 278
+        height: 247
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7769676f91ef1d010800000000000000
+      internalID: 1212029162201978487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: item image list 01_25
+      rect:
+        serializedVersion: 2
+        x: 918
+        y: 223
+        width: 259
+        height: 162
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a227ecbe466086a10800000000000000
+      internalID: 1902777873086706218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: item image list 01_37
+      rect:
+        serializedVersion: 2
+        x: 1205
+        y: 526
+        width: 227
+        height: 249
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 384107baf86f053c0800000000000000
+      internalID: -4372724141259746173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: ea0ceab2f48c80c4d9c210d434f26d2f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      item image list 01_0: -6184908811431142540
+      item image list 01_1: -7801769397820123551
+      item image list 01_10: -3277641841331899578
+      item image list 01_11: -8269802764177464816
+      item image list 01_12: 4187875181828516392
+      item image list 01_13: -258353408006799631
+      item image list 01_14: 1212029162201978487
+      item image list 01_15: -1345481466783675261
+      item image list 01_16: -7467906776853470817
+      item image list 01_17: -321745716072584690
+      item image list 01_18: 5905209954116787573
+      item image list 01_19: 1511598575175824766
+      item image list 01_2: 2354283900930154729
+      item image list 01_20: 3636907847948021649
+      item image list 01_21: 5476686168598219827
+      item image list 01_22: 1230567235006579734
+      item image list 01_23: 8965685055537701734
+      item image list 01_24: 1929911130233237438
+      item image list 01_25: 1902777873086706218
+      item image list 01_26: -8600873187053627811
+      item image list 01_27: 8974078642439559634
+      item image list 01_28: -7794963059585232533
+      item image list 01_29: 8438537412574742186
+      item image list 01_3: -4862880570105916652
+      item image list 01_30: -1309315528346554063
+      item image list 01_31: -324699486839499740
+      item image list 01_32: 4674036038409048528
+      item image list 01_33: -7904351994958640253
+      item image list 01_34: 9016658951453591632
+      item image list 01_35: -4131883109067540181
+      item image list 01_36: -4412482069088926607
+      item image list 01_37: -4372724141259746173
+      item image list 01_38: 3293373806956743101
+      item image list 01_39: 8239023955740429471
+      item image list 01_4: -6645236715615724399
+      item image list 01_40: -5814008481432345746
+      item image list 01_41: 815460046620550841
+      item image list 01_42: 4395771864033953362
+      item image list 01_43: 7610270146880520511
+      item image list 01_44: 7472653068197047606
+      item image list 01_45: -4625291514974041405
+      item image list 01_46: -1982655062
+      item image list 01_5: 3026934993862161692
+      item image list 01_6: 2379743562754008992
+      item image list 01_7: -3211295145723502809
+      item image list 01_8: 6025297544074570239
+      item image list 01_9: -522461069124378
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

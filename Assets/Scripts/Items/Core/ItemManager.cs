@@ -4,26 +4,59 @@ using Items.Data;
 using Items.Enums;
 using Items.Events;
 
+/// <summary>
+/// 아이템 매니저 - 장착/해제 및 랜덤 아이템 뽑기 담당
+/// 싱글톤 패턴으로 전역 접근 가능
+/// </summary>
 public class ItemManager : MonoBehaviour
 {
+    private static ItemManager instance;
+    public static ItemManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                GameObject go = new GameObject("ItemManager");
+                instance = go.AddComponent<ItemManager>();
+                DontDestroyOnLoad(go);
+            }
+            return instance;
+        }
+    }
+
     [Header("References")]
     [SerializeField] private PlayerStats playerStats;
     [SerializeField] private SetEffectManager setEffectManager;
 
     private List<ItemInstance> equippedItems = new List<ItemInstance>();
     private Dictionary<string, ItemData> itemDataCache = new Dictionary<string, ItemData>();
+    private ItemPoolManager itemPoolManager;
 
     private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();
         
         if (setEffectManager == null)
             setEffectManager = GetComponent<SetEffectManager>();
 
-        if (playerStats == null || setEffectManager == null)
+        // ItemPoolManager 초기화
+        itemPoolManager = ItemPoolManager.Instance;
+        if (itemPoolManager == null)
         {
-            Debug.LogError("ItemManager: PlayerStats 또는 SetEffectManager를 찾을 수 없습니다!");
+            Debug.LogWarning("ItemManager: ItemPoolManager를 찾을 수 없습니다. 랜덤 아이템 기능이 작동하지 않을 수 있습니다.");
         }
     }
 
@@ -197,5 +230,87 @@ public class ItemManager : MonoBehaviour
             itemDataCache[data.itemId] = data;
         }
     }
+
+    #region Random Item Methods (ItemPoolManager 위임)
+
+    /// <summary>
+    /// 랜덤 아이템 뽑기 (기본 - 레벨업 아이템만)
+    /// </summary>
+    /// <param name="count">뽑을 개수</param>
+    /// <returns>랜덤으로 선택된 ItemData 리스트</returns>
+    public List<ItemData> GetRandomItems(int count)
+    {
+        if (itemPoolManager == null)
+        {
+            Debug.LogError("ItemManager: ItemPoolManager가 초기화되지 않았습니다!");
+            return new List<ItemData>();
+        }
+        return itemPoolManager.GetRandomItems(count);
+    }
+
+    /// <summary>
+    /// 랜덤 아이템 뽑기 (고급 - 필터링 옵션)
+    /// </summary>
+    public List<ItemData> GetRandomItems(
+        int count,
+        bool useLevelUpItems = true,
+        bool useNormalItems = false,
+        bool useSetItems = false,
+        bool allowDuplicates = false,
+        List<ItemRarity> rarityFilter = null,
+        List<ItemType> typeFilter = null)
+    {
+        if (itemPoolManager == null)
+        {
+            Debug.LogError("ItemManager: ItemPoolManager가 초기화되지 않았습니다!");
+            return new List<ItemData>();
+        }
+        return itemPoolManager.GetRandomItems(count, useLevelUpItems, useNormalItems, useSetItems, allowDuplicates, rarityFilter, typeFilter);
+    }
+
+    /// <summary>
+    /// 특정 레어도의 아이템만 뽑기
+    /// </summary>
+    public List<ItemData> GetRandomItemsByRarity(int count, ItemRarity rarity, bool allowDuplicates = false)
+    {
+        if (itemPoolManager == null)
+        {
+            Debug.LogError("ItemManager: ItemPoolManager가 초기화되지 않았습니다!");
+            return new List<ItemData>();
+        }
+        return itemPoolManager.GetRandomItemsByRarity(count, rarity, allowDuplicates);
+    }
+
+    /// <summary>
+    /// 특정 타입의 아이템만 뽑기
+    /// </summary>
+    public List<ItemData> GetRandomItemsByType(int count, ItemType type, bool allowDuplicates = false)
+    {
+        if (itemPoolManager == null)
+        {
+            Debug.LogError("ItemManager: ItemPoolManager가 초기화되지 않았습니다!");
+            return new List<ItemData>();
+        }
+        return itemPoolManager.GetRandomItemsByType(count, type, allowDuplicates);
+    }
+
+    /// <summary>
+    /// ItemData 리스트를 ItemInstance 리스트로 변환
+    /// </summary>
+    public List<ItemInstance> ConvertToItemInstances(List<ItemData> itemDataList)
+    {
+        List<ItemInstance> instances = new List<ItemInstance>();
+        foreach (var data in itemDataList)
+        {
+            if (data != null)
+            {
+                ItemInstance instance = new ItemInstance(data);
+                instances.Add(instance);
+            }
+        }
+        return instances;
+    }
+
+    #endregion
 }
 

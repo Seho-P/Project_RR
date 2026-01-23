@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Items.Data;
 using Items.Events;
 using System;
+using Items.Enums;
 
 /// <summary>
 /// 레벨업 UI 관리 클래스
@@ -45,6 +46,9 @@ public class LevelUpUI : MonoBehaviour
         if (createSlotsOnStart)
         {
             CreateSlots();
+            List<ItemData> items = ItemManager.Instance.GetRandomItems(5,true,true);
+            List<ItemInstance> itemInstances = ItemManager.Instance.ConvertToItemInstances(items);
+            SetSlotItems(itemInstances);
         }
     }
 
