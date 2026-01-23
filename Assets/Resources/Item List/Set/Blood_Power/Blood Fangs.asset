@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: 001
   itemName: "\uD54F\uBE5B \uC1A1\uACF3\uB2C8"
   description: "\uD53C\uAC00 \uD750\uB974\uB294 \uC1A1\uACF3\uB2C8\uB2E4"
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 1212029162201978487, guid: 3a48121bc02e78e44a0f62e7166e64b7, type: 3}
   itemType: 2
   rarity: 2
   baseStats:
