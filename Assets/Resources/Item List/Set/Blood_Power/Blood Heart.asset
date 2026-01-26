@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d60905340049684494acdf2789613bd, type: 3}
+  m_Name: Blood Heart
+  m_EditorClassIdentifier: Assembly-CSharp::Items.Data.ItemData
+  itemId: 004
+  itemName: "\uD54F\uBE5B \uC2EC\uC7A5"
+  description: "\uB9C8\uCE58 \uBC29\uAE08 \uBF51\uC740 \uAC83\uCC98\uB7FC \uB6F0\uACE0
+    \uC788\uB2E4.."
+  itemIcon: {fileID: -7801769397820123551, guid: 3a48121bc02e78e44a0f62e7166e64b7, type: 3}
+  itemType: 0
+  rarity: 0
+  baseStats:
+  - statType: 3
+    flatBonus: 0
+    percentageBonus: 10
+  setName: "\uD53C\uC758 \uBD84\uB178"
+  setPieceNumber: 4

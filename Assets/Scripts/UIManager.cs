@@ -4,6 +4,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Cysharp.Threading.Tasks;
 using Items.Events;
+using UnityEngine.UI;
 
 /// <summary>
 /// UI 관리 싱글톤 클래스
@@ -32,6 +33,8 @@ public class UIManager : MonoBehaviour
     // 인벤토리 UI 캐싱
     private InventoryUI cachedInventoryUI;
     private GameObject cachedInventoryGameObject;
+    // 레벨업 오버레이 캐싱
+    private GameObject levelUpOverlay;
 
     private void Awake()
     {
@@ -61,7 +64,7 @@ public class UIManager : MonoBehaviour
         }
 
         // 레벨업 이벤트 구독
-        PlayerLevelEvents.OnLevelUp += (newLevel) => OnLevelUp(newLevel).Forget();
+        PlayerLevelEvents.OnLevelUp += HandleLevelUp;
     }
 
     /// <summary>
@@ -263,24 +266,81 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 레벨업 오버레이 생성 (반투명 검은 배경)
+    /// </summary>
+    private GameObject CreateLevelUpOverlay()
+    {
+        // 오버레이가 이미 있으면 재사용
+        if (levelUpOverlay != null)
+        {
+            levelUpOverlay.SetActive(true);
+            return levelUpOverlay;
+        }
+
+        // 오버레이 패널 생성
+        GameObject overlayObj = new GameObject("LevelUpOverlay");
+        overlayObj.transform.SetParent(uiCanvas.transform, false);
+        
+        // RectTransform 설정 (전체 화면)
+        RectTransform rectTransform = overlayObj.AddComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.sizeDelta = Vector2.zero;
+        rectTransform.anchoredPosition = Vector2.zero;
+        
+        // Image 컴포넌트 추가 (반투명 검은색)
+        Image overlayImage = overlayObj.AddComponent<Image>();
+        overlayImage.color = new Color(0f, 0f, 0f, 0.8f); // 알파값 조절 가능 (0.7 = 70% 불투명도)
+        
+        // 레벨업 UI보다 뒤에 배치되도록 순서 설정
+        overlayObj.transform.SetAsFirstSibling();
+        
+        levelUpOverlay = overlayObj;
+        return overlayObj;
+    }
+
+    /// <summary>
+    /// 레벨업 오버레이 제거
+    /// </summary>
+    private void RemoveLevelUpOverlay()
+    {
+        if (levelUpOverlay != null)
+        {
+            Destroy(levelUpOverlay);
+            levelUpOverlay = null;
+        }
+    }
+
     public async UniTaskVoid OnLevelUp(int newLevel)
     {
         Time.timeScale = 0f;
+
+        CreateLevelUpOverlay();
+
         var ui = await ShowUI<LevelUpUI>("LevelUpPanel");
         ui.OnLevelUpCompleted += OnLevelUpCompleted;
+    }
+
+    private void HandleLevelUp(int newLevel)
+    {
+        OnLevelUp(newLevel).Forget();
     }
 
     private void OnLevelUpCompleted(LevelUpUI ui)
     {
         ui.OnLevelUpCompleted -= OnLevelUpCompleted;
+        PlayerLevelEvents.OnLevelUp -= HandleLevelUp;
         Addressables.ReleaseInstance(ui.gameObject);
         Time.timeScale = 1f;
+        levelUpOverlay.SetActive(false);
     }
 
     private void OnDestroy()
     {
         // UIManager가 파괴될 때 인벤토리 캐시 해제
         ReleaseInventoryUI();
+        RemoveLevelUpOverlay();
     }
 
     // 프로퍼티

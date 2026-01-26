@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14fa3bf981ffafa479512e9c5dbeddb0, type: 3}
+  m_Name: Item Database
+  m_EditorClassIdentifier: Assembly-CSharp::Items.Data.ItemDatabase
+  levelUpItems: []
+  normalItems:
+  - {fileID: 11400000, guid: 25e296c94bf7bb84687343d98443073c, type: 2}
+  - {fileID: 11400000, guid: a234716c312141b4ebe8374ea7b8bf19, type: 2}
+  - {fileID: 11400000, guid: 7a764560f618c31429ea9226ca1708b3, type: 2}
+  - {fileID: 11400000, guid: 7af9c0af260fc4b4193ae6bb34942397, type: 2}
+  - {fileID: 11400000, guid: f26ea8c51e303124e986dcfe012ef83f, type: 2}
+  - {fileID: 11400000, guid: c7275595e4b9b8f4d8d90df819ffcbcb, type: 2}
+  setItems: []
+  allowedRarities: 
+  allowedTypes: 

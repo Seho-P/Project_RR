@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d60905340049684494acdf2789613bd, type: 3}
-  m_Name: Blood Heart
+  m_Name: Blood Fangs
   m_EditorClassIdentifier: Assembly-CSharp::Items.Data.ItemData
-  itemId: 004
-  itemName: "\uD54F\uBE5B \uC2EC\uC7A5"
-  description: "\uB9C8\uCE58 \uBC29\uAE08 \uBF51\uC740 \uAC83\uCC98\uB7FC \uB6F0\uACE0
-    \uC788\uB2E4.."
-  itemIcon: {fileID: 0}
-  itemType: 0
-  rarity: 0
+  itemId: 001
+  itemName: "\uD54F\uBE5B \uC1A1\uACF3\uB2C8"
+  description: "\uD53C\uAC00 \uD750\uB974\uB294 \uC1A1\uACF3\uB2C8\uB2E4"
+  itemIcon: {fileID: 1212029162201978487, guid: 3a48121bc02e78e44a0f62e7166e64b7, type: 3}
+  itemType: 2
+  rarity: 2
   baseStats:
-  - statType: 3
+  - statType: 9
     flatBonus: 0
-    percentageBonus: 10
+    percentageBonus: 3
   setName: "\uD53C\uC758 \uBD84\uB178"
-  setPieceNumber: 4
+  setPieceNumber: 1
