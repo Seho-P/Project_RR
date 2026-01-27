@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using Items.Data;
 using Items.Enums;
@@ -9,7 +10,7 @@ using Items.Enums;
 /// 인벤토리, 레벨업 선택, 장비 슬롯 등 다양한 용도로 사용 가능
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class ItemSlot : MonoBehaviour
+public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI References")]
     [SerializeField] private Image iconImage;           // 아이템 아이콘
@@ -19,6 +20,9 @@ public class ItemSlot : MonoBehaviour
     [SerializeField] private GameObject enhancementBadge; // 강화 레벨 배지
     [SerializeField] private TextMeshProUGUI enhancementText; // 강화 레벨 텍스트
     [SerializeField] private GameObject emptySlotVisual; // 빈 슬롯 시각 효과
+
+    [Header("Tooltip")]
+    [SerializeField] private ItemTooltip tooltip; // 툴팁 참조 (없으면 자동으로 찾음)
 
     [Header("Rarity Colors")]
     [SerializeField] private Color commonColor = Color.gray;
@@ -30,6 +34,7 @@ public class ItemSlot : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool showEnhancementLevel = true;
     [SerializeField] private bool showEmptyVisual = true;
+    [SerializeField] private bool enableTooltip = true; // 툴팁 활성화 여부
 
     private Button slotButton;
     private ItemInstance currentItem;
@@ -60,6 +65,16 @@ public class ItemSlot : MonoBehaviour
             enhancementText = enhancementBadge?.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
         if (emptySlotVisual == null)
             emptySlotVisual = transform.Find("EmptyVisual")?.gameObject;
+
+        // 툴팁 자동 찾기 (씬에 하나만 있다고 가정)
+        if (tooltip == null && enableTooltip)
+        {
+            tooltip = FindFirstObjectByType<ItemTooltip>();
+            if (tooltip == null)
+            {
+                Debug.LogWarning($"ItemSlot: {gameObject.name}에 ItemTooltip을 찾을 수 없습니다. 툴팁이 표시되지 않을 수 있습니다.");
+            }
+        }
     }
 
     private void OnDestroy()
@@ -210,6 +225,38 @@ public class ItemSlot : MonoBehaviour
     public void SetActive(bool active)
     {
         gameObject.SetActive(active);
+    }
+
+    /// <summary>
+    /// 마우스가 슬롯 위에 올라왔을 때 호출
+    /// </summary>
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (!enableTooltip || tooltip == null || currentItem == null || currentItem.ItemData == null)
+            return;
+
+        // 마우스 위치를 스크린 좌표로 변환
+        Vector2 screenPosition = eventData.position;
+        tooltip.ShowTooltip(currentItem, screenPosition);
+    }
+
+    /// <summary>
+    /// 마우스가 슬롯에서 벗어났을 때 호출
+    /// </summary>
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (!enableTooltip || tooltip == null)
+            return;
+
+        tooltip.HideTooltip();
+    }
+
+    /// <summary>
+    /// 툴팁 참조 설정
+    /// </summary>
+    public void SetTooltip(ItemTooltip tooltipInstance)
+    {
+        tooltip = tooltipInstance;
     }
 
     // 프로퍼티

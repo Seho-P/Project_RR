@@ -20,7 +20,7 @@ MonoBehaviour:
   rarity: 0
   baseStats:
   - statType: 1
-    flatBonus: 1
-    percentageBonus: 0
+    flatBonus: 0
+    percentageBonus: 10
   setName: "\uD53C\uC758 \uBD84\uB178"
   setPieceNumber: 3

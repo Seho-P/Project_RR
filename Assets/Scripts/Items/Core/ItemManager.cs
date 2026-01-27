@@ -29,6 +29,9 @@ public class ItemManager : MonoBehaviour
     [SerializeField] private PlayerStats playerStats;
     [SerializeField] private SetEffectManager setEffectManager;
 
+    [Header("디버그 설정")]
+    [SerializeField] private bool enableStatLogging = true; // 스탯 변화 로깅 활성화
+
     private List<ItemInstance> equippedItems = new List<ItemInstance>();
     private Dictionary<string, ItemData> itemDataCache = new Dictionary<string, ItemData>();
     private ItemPoolManager itemPoolManager;
@@ -63,9 +66,16 @@ public class ItemManager : MonoBehaviour
     // 아이템 장착
     public bool EquipItem(ItemInstance item)
     {
-        if (item == null || item.ItemData == null)
+        if (item == null)
         {
             Debug.LogWarning("ItemManager: 장착할 아이템이 유효하지 않습니다.");
+            return false;
+        }
+
+        // ItemData가 없으면 실패
+        if (item.ItemData == null)
+        {
+            Debug.LogWarning($"ItemManager: 아이템 데이터가 없습니다. (ItemID: {item.ItemDataId ?? "Unknown"})");
             return false;
         }
 
@@ -76,16 +86,26 @@ public class ItemManager : MonoBehaviour
             return false;
         }
 
-        // 아이템 데이터 로드
-        LoadItemData(item);
-
         equippedItems.Add(item);
+
+        // 스탯 적용 전 현재 스탯 저장 (로깅용)
+        Dictionary<StatType, float> statsBefore = null;
+        if (enableStatLogging && playerStats != null)
+        {
+            statsBefore = GetCurrentStatsSnapshot();
+        }
 
         // 스탯 적용
         ApplyItemStats(item);
 
         // 세트 효과 업데이트
         setEffectManager?.UpdateSetCounts(equippedItems);
+
+        // 스탯 변화 로깅
+        if (enableStatLogging && playerStats != null && statsBefore != null)
+        {
+            LogStatChanges(item, statsBefore, true);
+        }
 
         // 이벤트 발생
         ItemEvents.InvokeItemEquipped(item);
@@ -104,11 +124,24 @@ public class ItemManager : MonoBehaviour
 
         equippedItems.Remove(item);
 
+        // 스탯 제거 전 현재 스탯 저장 (로깅용)
+        Dictionary<StatType, float> statsBefore = null;
+        if (enableStatLogging && playerStats != null)
+        {
+            statsBefore = GetCurrentStatsSnapshot();
+        }
+
         // 스탯 제거
         RemoveItemStats(item);
 
         // 세트 효과 업데이트
         setEffectManager?.UpdateSetCounts(equippedItems);
+
+        // 스탯 변화 로깅
+        if (enableStatLogging && playerStats != null && statsBefore != null)
+        {
+            LogStatChanges(item, statsBefore, false);
+        }
 
         // 이벤트 발생
         ItemEvents.InvokeItemUnequipped(item);
@@ -161,34 +194,6 @@ public class ItemManager : MonoBehaviour
             {
                 playerStats.RemoveItemStat(kvp.Key, 0f, kvp.Value);
             }
-        }
-    }
-
-    // 아이템 데이터 로드
-    private void LoadItemData(ItemInstance item)
-    {
-        if (item.ItemData != null) return; // 이미 로드됨
-
-        string itemId = item.ItemDataId;
-        if (string.IsNullOrEmpty(itemId)) return;
-
-        // 캐시에서 찾기
-        if (itemDataCache.ContainsKey(itemId))
-        {
-            item.LoadItemData(itemDataCache[itemId]);
-            return;
-        }
-
-        // Resources 폴더에서 로드 (또는 다른 방식)
-        ItemData data = Resources.Load<ItemData>($"Items/{itemId}");
-        if (data != null)
-        {
-            itemDataCache[itemId] = data;
-            item.LoadItemData(data);
-        }
-        else
-        {
-            Debug.LogWarning($"ItemManager: ItemData를 찾을 수 없습니다: {itemId}");
         }
     }
 
@@ -309,6 +314,88 @@ public class ItemManager : MonoBehaviour
             }
         }
         return instances;
+    }
+
+    #endregion
+
+    #region 디버그 및 로깅
+
+    /// <summary>
+    /// 현재 스탯의 스냅샷을 가져옵니다 (로깅용)
+    /// </summary>
+    private Dictionary<StatType, float> GetCurrentStatsSnapshot()
+    {
+        var snapshot = new Dictionary<StatType, float>();
+        foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
+        {
+            snapshot[statType] = playerStats.GetStat(statType);
+        }
+        return snapshot;
+    }
+
+    /// <summary>
+    /// 아이템 장착/해제 시 스탯 변화를 콘솔에 로깅합니다
+    /// </summary>
+    private void LogStatChanges(ItemInstance item, Dictionary<StatType, float> statsBefore, bool isEquipping)
+    {
+        if (item?.ItemData == null || playerStats == null) return;
+
+        System.Text.StringBuilder log = new System.Text.StringBuilder();
+        log.AppendLine($"\n=== 아이템 {(isEquipping ? "장착" : "해제")}: {item.ItemData.itemName} ===");
+
+        bool hasChanges = false;
+
+        // 모든 스탯 비교
+        foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
+        {
+            float before = statsBefore.ContainsKey(statType) ? statsBefore[statType] : 0f;
+            float after = playerStats.GetStat(statType);
+            float difference = after - before;
+
+            // 변화가 있는 스탯만 표시
+            if (Mathf.Abs(difference) > 0.01f)
+            {
+                string statName = GetStatName(statType);
+                string changeText = difference > 0 ? $"+{difference:F2}" : $"{difference:F2}";
+                log.AppendLine($"  {statName}: {before:F2} → {after:F2} ({changeText})");
+                hasChanges = true;
+            }
+        }
+
+        if (hasChanges)
+        {
+            Debug.Log(log.ToString());
+        }
+        else
+        {
+            Debug.Log($"[ItemManager] {item.ItemData.itemName} {(isEquipping ? "장착" : "해제")} - 스탯 변화 없음");
+        }
+    }
+
+    /// <summary>
+    /// 스탯 타입의 한글 이름을 반환합니다
+    /// </summary>
+    private string GetStatName(StatType statType)
+    {
+        switch (statType)
+        {
+            case StatType.MaxHealth: return "최대 체력";
+            case StatType.HealthRegen: return "체력 재생";
+            case StatType.MoveSpeed: return "이동 속도";
+            case StatType.AttackSpeed: return "공격 속도";
+            case StatType.AttackDamage: return "공격력";
+            case StatType.CriticalChance: return "치명타 확률";
+            case StatType.CriticalDamage: return "치명타 피해";
+            case StatType.Defense: return "방어력";
+            case StatType.DamageReduction: return "피해 감소";
+            case StatType.LifeSteal: return "생명력 흡수";
+            case StatType.CooldownReduction: return "재사용 대기시간 감소";
+            case StatType.ExperienceGain: return "경험치 획득";
+            case StatType.GoldGain: return "골드 획득";
+            case StatType.ProjectileSpeed: return "투사체 속도";
+            case StatType.AttackRange: return "공격 범위";
+            default: return statType.ToString();
+        }
     }
 
     #endregion
