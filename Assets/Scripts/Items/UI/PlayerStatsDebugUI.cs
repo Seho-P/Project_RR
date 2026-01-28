@@ -3,7 +3,6 @@ using Items.Enums;
 using Items.Events;
 using Items.Data;
 using System.Collections.Generic;
-using System.Text;
 
 /// <summary>
 /// 플레이어 스탯을 실시간으로 화면에 표시하는 디버그 UI
@@ -40,8 +39,6 @@ public class PlayerStatsDebugUI : MonoBehaviour
 
     private void Start()
     {
-        // 스탯 변경 이벤트 구독
-        // 주의: InitializeStyles()는 OnGUI() 내부에서만 호출해야 합니다 (GUI.skin 접근 제한)
         ItemEvents.OnStatsChanged += OnStatsChanged;
         ItemEvents.OnItemEquipped += OnItemEquipped;
         ItemEvents.OnItemUnequipped += OnItemUnequipped;
@@ -200,21 +197,16 @@ public class PlayerStatsDebugUI : MonoBehaviour
 
     private void OnStatsChanged()
     {
-        // 스탯이 변경되면 이전 값 업데이트
-        if (playerStats != null)
-        {
-            foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
-            {
-                previousStats[statType] = playerStats.GetStat(statType);
-            }
-        }
+        // 스탯 변경 시 이전 스탯 업데이트는 아이템 장착/해제 이벤트에서 처리
     }
 
     private void OnItemEquipped(ItemInstance item)
     {
         if (item?.ItemData != null)
         {
-            LogItemStatsChange(item, true);
+            // 아이템 장착 후 스탯이 변경되었으므로,
+            // 현재 스탯에서 아이템의 플랫 스탯을 빼서 장착 전 스탯을 계산
+            UpdatePreviousStatsFromItem(item, true);
         }
     }
 
@@ -222,45 +214,36 @@ public class PlayerStatsDebugUI : MonoBehaviour
     {
         if (item?.ItemData != null)
         {
-            LogItemStatsChange(item, false);
+            // 아이템 해제 후 스탯이 변경되었으므로,
+            // 현재 스탯에 아이템의 플랫 스탯을 더해서 해제 전 스탯을 계산
+            UpdatePreviousStatsFromItem(item, false);
         }
     }
 
-    private void LogItemStatsChange(ItemInstance item, bool equipped)
+    private void UpdatePreviousStatsFromItem(ItemInstance item, bool equipped)
     {
-        if (playerStats == null) return;
+        // 아이템 장착/해제 전 스탯을 계산하여 저장
+        // 플랫 스탯만 고려하여 간단하게 계산
+        if (playerStats == null || item?.ItemData == null) return;
 
-        StringBuilder log = new StringBuilder();
-        log.AppendLine($"=== 아이템 {(equipped ? "장착" : "해제")}: {item.ItemData.itemName} ===");
-        
         var stats = item.GetTotalStats();
-        var percentageBonuses = item.GetPercentageBonuses();
 
-        bool hasChanges = false;
-
-        // 플랫 스탯 변화
-        foreach (var kvp in stats)
+        foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
         {
-            if (kvp.Value != 0f)
+            float currentValue = playerStats.GetStat(statType);
+            float itemFlatValue = stats.ContainsKey(statType) ? stats[statType] : 0f;
+
+            if (equipped)
             {
-                log.AppendLine($"  {GetStatName(kvp.Key)}: {(equipped ? "+" : "-")}{kvp.Value:F2}");
-                hasChanges = true;
+                // 장착된 경우: 현재 값에서 아이템 플랫 값을 빼서 장착 전 값 계산
+                previousStats[statType] = currentValue - itemFlatValue;
             }
-        }
-
-        // 퍼센트 보너스 변화
-        foreach (var kvp in percentageBonuses)
-        {
-            if (kvp.Value != 0f)
+            else
             {
-                log.AppendLine($"  {GetStatName(kvp.Key)}: {(equipped ? "+" : "-")}{kvp.Value:F2}%");
-                hasChanges = true;
+                // 해제된 경우: 현재 값에 아이템 플랫 값을 더해서 해제 전 값 계산
+                previousStats[statType] = currentValue + itemFlatValue;
             }
-        }
-
-        if (hasChanges)
-        {
-            Debug.Log(log.ToString());
         }
     }
+
 }
