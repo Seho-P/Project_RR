@@ -29,9 +29,6 @@ public class ItemTooltip : MonoBehaviour
     [SerializeField] private Color epicColor = Color.magenta;
     [SerializeField] private Color legendaryColor = Color.yellow;
 
-    private Canvas parentCanvas;
-    private RectTransform canvasRect;
-
     private void Awake()
     {
         // UI 참조 자동 찾기
@@ -52,30 +49,21 @@ public class ItemTooltip : MonoBehaviour
         if (tooltipRect == null)
             tooltipRect = GetComponent<RectTransform>();
 
-        // Canvas 찾기
-        parentCanvas = GetComponentInParent<Canvas>();
-        if (parentCanvas != null)
-        {
-            canvasRect = parentCanvas.GetComponent<RectTransform>();
-        }
-
         // 초기에는 숨김
         gameObject.SetActive(false);
     }
 
     /// <summary>
-    /// 아이템 정보를 표시합니다.
+    /// 아이템 데이터를 설정합니다. (표시만 담당)
     /// </summary>
-    public void ShowTooltip(ItemInstance item, Vector2 screenPosition)
+    public void SetData(ItemInstance item)
     {
         if (item == null || item.ItemData == null)
         {
-            HideTooltip();
             return;
         }
 
         ItemData data = item.ItemData;
-        gameObject.SetActive(true);
 
         // 아이템 이름
         if (itemNameText != null)
@@ -137,50 +125,33 @@ public class ItemTooltip : MonoBehaviour
             Color rarityColor = GetRarityColor(data.rarity);
             backgroundImage.color = new Color(rarityColor.r, rarityColor.g, rarityColor.b, 0.9f);
         }
+    }
 
-        // 위치 설정
-        SetTooltipPosition(screenPosition);
+    /// <summary>
+    /// 툴팁을 표시합니다.
+    /// </summary>
+    public void Show()
+    {
+        Debug.Log($"ItemTooltip.Show() 호출됨 - GameObject: {gameObject.name}, 부모: {transform.parent?.name}, 활성화 상태: {gameObject.activeSelf}");
+        
+        // 부모가 비활성화되어 있으면 활성화
+        if (transform.parent != null && !transform.parent.gameObject.activeSelf)
+        {
+            Debug.LogWarning($"ItemTooltip: 부모 {transform.parent.name}가 비활성화되어 있습니다. 활성화합니다.");
+            transform.parent.gameObject.SetActive(true);
+        }
+        
+        gameObject.SetActive(true);
+        
+        Debug.Log($"ItemTooltip.Show() 완료 - 활성화 상태: {gameObject.activeSelf}, 활성화 계층: {gameObject.activeInHierarchy}");
     }
 
     /// <summary>
     /// 툴팁을 숨깁니다.
     /// </summary>
-    public void HideTooltip()
+    public void Hide()
     {
         gameObject.SetActive(false);
-    }
-
-    /// <summary>
-    /// 툴팁 위치를 설정합니다.
-    /// </summary>
-    private void SetTooltipPosition(Vector2 screenPosition)
-    {
-        if (tooltipRect == null || canvasRect == null) return;
-
-        Vector2 localPoint;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect, screenPosition, parentCanvas.worldCamera, out localPoint);
-
-        // 마우스 위치 기준으로 오프셋 설정
-        localPoint.x += 10f;
-        localPoint.y += 10f;
-
-        // 화면 밖으로 나가지 않도록 조정
-        float tooltipWidth = tooltipRect.rect.width;
-        float tooltipHeight = tooltipRect.rect.height;
-        float canvasWidth = canvasRect.rect.width;
-        float canvasHeight = canvasRect.rect.height;
-
-        if (localPoint.x + tooltipWidth > canvasWidth * 0.5f)
-            localPoint.x = canvasWidth * 0.5f - tooltipWidth - 10f;
-        if (localPoint.y + tooltipHeight > canvasHeight * 0.5f)
-            localPoint.y = canvasHeight * 0.5f - tooltipHeight - 10f;
-        if (localPoint.x < -canvasWidth * 0.5f)
-            localPoint.x = -canvasWidth * 0.5f + 10f;
-        if (localPoint.y < -canvasHeight * 0.5f)
-            localPoint.y = -canvasHeight * 0.5f + 10f;
-
-        tooltipRect.localPosition = localPoint;
     }
 
     /// <summary>
