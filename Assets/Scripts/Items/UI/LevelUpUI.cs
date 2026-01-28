@@ -174,14 +174,9 @@ public class LevelUpUI : MonoBehaviour
 
         // 아이템 선택 처리
         Debug.Log($"레벨업 아이템 선택: {item.ItemData.itemName} (슬롯 {slot.SlotIndex})");
-        
-        // 여기에 아이템 선택 로직 추가
-        // 예: OnItemSelected?.Invoke(item);
 
-        // OnCompleted?.Invoke(this);
-        
-        // 선택 후 UI 숨기기 (필요시)
-        // Hide();
+        ItemManager.Instance.EquipItem(item);
+        OnLevelUpCompleted?.Invoke(this);
     }
 
     /// <summary>

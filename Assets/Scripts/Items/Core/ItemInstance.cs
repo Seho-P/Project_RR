@@ -107,11 +107,25 @@ using Items.Data;
         return stats;
     }
 
-    // 퍼센트 보너스 가져오기 (랜덤 옵션)
+    // 퍼센트 보너스 가져오기 (기본 스탯 + 랜덤 옵션)
     public Dictionary<StatType, float> GetPercentageBonuses()
     {
         var bonuses = new Dictionary<StatType, float>();
 
+        if (itemData == null) return bonuses;
+
+        // 1. 기본 스탯의 퍼센트 보너스
+        foreach (var baseStat in itemData.baseStats)
+        {
+            if (baseStat.percentageBonus != 0f)
+            {
+                if (!bonuses.ContainsKey(baseStat.statType))
+                    bonuses[baseStat.statType] = 0f;
+                bonuses[baseStat.statType] += baseStat.percentageBonus;
+            }
+        }
+
+        // 2. 랜덤 옵션의 퍼센트 보너스
         foreach (var option in randomOptions)
         {
             if (option.percentageValue != 0f)
