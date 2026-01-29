@@ -202,20 +202,17 @@ public class TooltipManager : MonoBehaviour
             tooltipCanvas.gameObject.SetActive(true);
         }
         
-        // 먼저 툴팁을 표시 (레이아웃 계산을 위해)
-        itemTooltip.Show();
-        Debug.Log("TooltipManager: ItemTooltip.Show() 호출됨");
-
-        // 아이템 데이터 설정
+        // 아이템 데이터 먼저 설정 (레이아웃 계산을 위해)
         itemTooltip.SetData(currentItem);
-        Debug.Log("TooltipManager: ItemTooltip.SetData() 호출됨");
 
         // 레이아웃 업데이트 후 위치 계산
         Canvas.ForceUpdateCanvases();
 
         // 위치 계산 및 설정
         SetTooltipPosition(currentSlotRect);
-        Debug.Log($"TooltipManager: 위치 설정 완료 - {tooltipRect.anchoredPosition}");
+
+        // 마지막에 툴팁 표시 (위치 설정 후)
+        itemTooltip.Show();
     }
 
     /// <summary>

@@ -21,6 +21,7 @@ public class ItemTooltip : MonoBehaviour
     [SerializeField] private TextMeshProUGUI setInfoText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private RectTransform tooltipRect;
+    [SerializeField] private CanvasGroup tooltipGroup;
 
     [Header("Rarity Colors")]
     [SerializeField] private Color commonColor = Color.gray;
@@ -48,9 +49,21 @@ public class ItemTooltip : MonoBehaviour
             backgroundImage = GetComponent<Image>();
         if (tooltipRect == null)
             tooltipRect = GetComponent<RectTransform>();
+        
+        // CanvasGroup 자동 찾기 또는 생성
+        if (tooltipGroup == null)
+            tooltipGroup = GetComponent<CanvasGroup>();
+        
+        if (tooltipGroup == null)
+            tooltipGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // 초기에는 숨김
-        gameObject.SetActive(false);
+        // 초기에는 숨김 (CanvasGroup으로 관리)
+        tooltipGroup.alpha = 0f;
+        tooltipGroup.blocksRaycasts = false;
+        tooltipGroup.interactable = false;
+        
+        // GameObject는 항상 활성화 상태 유지
+        gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -132,18 +145,24 @@ public class ItemTooltip : MonoBehaviour
     /// </summary>
     public void Show()
     {
-        Debug.Log($"ItemTooltip.Show() 호출됨 - GameObject: {gameObject.name}, 부모: {transform.parent?.name}, 활성화 상태: {gameObject.activeSelf}");
-        
-        // 부모가 비활성화되어 있으면 활성화
-        if (transform.parent != null && !transform.parent.gameObject.activeSelf)
+        if (tooltipGroup == null)
         {
-            Debug.LogWarning($"ItemTooltip: 부모 {transform.parent.name}가 비활성화되어 있습니다. 활성화합니다.");
-            transform.parent.gameObject.SetActive(true);
+            Debug.LogError("ItemTooltip: CanvasGroup이 없습니다.");
+            return;
         }
+
+        // GameObject는 항상 활성화 상태 유지
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
+        // CanvasGroup으로 표시
+        tooltipGroup.alpha = 1f;
+        tooltipGroup.blocksRaycasts = false; // 툴팁은 클릭 대상이 아니므로
+        tooltipGroup.interactable = false;
         
-        gameObject.SetActive(true);
-        
-        Debug.Log($"ItemTooltip.Show() 완료 - 활성화 상태: {gameObject.activeSelf}, 활성화 계층: {gameObject.activeInHierarchy}");
+        Debug.Log($"ItemTooltip.Show() 완료 - CanvasGroup alpha: {tooltipGroup.alpha}");
     }
 
     /// <summary>
@@ -151,7 +170,19 @@ public class ItemTooltip : MonoBehaviour
     /// </summary>
     public void Hide()
     {
-        gameObject.SetActive(false);
+        if (tooltipGroup == null)
+        {
+            Debug.LogError("ItemTooltip: CanvasGroup이 없습니다.");
+            return;
+        }
+
+        // CanvasGroup으로 숨김
+        tooltipGroup.alpha = 0f;
+        tooltipGroup.blocksRaycasts = false;
+        tooltipGroup.interactable = false;
+        
+        // GameObject는 활성화 상태 유지 (레이아웃 계산을 위해)
+        // gameObject.SetActive(false); // 제거됨
     }
 
     /// <summary>
