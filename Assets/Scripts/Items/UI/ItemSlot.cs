@@ -22,7 +22,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private GameObject emptySlotVisual; // 빈 슬롯 시각 효과
 
     [Header("Tooltip")]
-    [SerializeField] private ItemTooltip tooltip; // 툴팁 참조 (없으면 자동으로 찾음)
+    [SerializeField] private bool useTooltipManager = true; // TooltipManager 사용 여부
 
     [Header("Rarity Colors")]
     [SerializeField] private Color commonColor = Color.gray;
@@ -65,16 +65,6 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             enhancementText = enhancementBadge?.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
         if (emptySlotVisual == null)
             emptySlotVisual = transform.Find("EmptyVisual")?.gameObject;
-
-        // 툴팁 자동 찾기 (씬에 하나만 있다고 가정)
-        if (tooltip == null && enableTooltip)
-        {
-            tooltip = FindFirstObjectByType<ItemTooltip>();
-            if (tooltip == null)
-            {
-                Debug.LogWarning($"ItemSlot: {gameObject.name}에 ItemTooltip을 찾을 수 없습니다. 툴팁이 표시되지 않을 수 있습니다.");
-            }
-        }
     }
 
     private void OnDestroy()
@@ -232,12 +222,37 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!enableTooltip || tooltip == null || currentItem == null || currentItem.ItemData == null)
+        if (!enableTooltip || currentItem == null || currentItem.ItemData == null)
+        {
+            Debug.Log($"ItemSlot: 툴팁 비활성화 또는 아이템 없음 - enableTooltip: {enableTooltip}, currentItem: {currentItem != null}");
             return;
+        }
 
-        // 마우스 위치를 스크린 좌표로 변환
-        Vector2 screenPosition = eventData.position;
-        tooltip.ShowTooltip(currentItem, screenPosition);
+        if (useTooltipManager)
+        {
+            // TooltipManager 사용
+            if (TooltipManager.Instance != null)
+            {
+                RectTransform slotRect = GetComponent<RectTransform>();
+                Debug.Log($"ItemSlot: TooltipManager.ShowTooltip 호출 - {currentItem.ItemData.itemName}");
+                TooltipManager.Instance.ShowTooltip(currentItem, slotRect);
+            }
+            else
+            {
+                Debug.LogWarning("ItemSlot: TooltipManager.Instance가 null입니다.");
+            }
+        }
+        else
+        {
+            // 기존 방식 (하위 호환성)
+            ItemTooltip tooltip = FindFirstObjectByType<ItemTooltip>();
+            if (tooltip != null)
+            {
+                RectTransform slotRect = GetComponent<RectTransform>();
+                tooltip.SetData(currentItem);
+                tooltip.Show();
+            }
+        }
     }
 
     /// <summary>
@@ -245,18 +260,26 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!enableTooltip || tooltip == null)
+        if (!enableTooltip)
             return;
 
-        tooltip.HideTooltip();
-    }
-
-    /// <summary>
-    /// 툴팁 참조 설정
-    /// </summary>
-    public void SetTooltip(ItemTooltip tooltipInstance)
-    {
-        tooltip = tooltipInstance;
+        if (useTooltipManager)
+        {
+            // TooltipManager 사용
+            if (TooltipManager.Instance != null)
+            {
+                TooltipManager.Instance.HideTooltip();
+            }
+        }
+        else
+        {
+            // 기존 방식 (하위 호환성)
+            ItemTooltip tooltip = FindFirstObjectByType<ItemTooltip>();
+            if (tooltip != null)
+            {
+                tooltip.Hide();
+            }
+        }
     }
 
     // 프로퍼티

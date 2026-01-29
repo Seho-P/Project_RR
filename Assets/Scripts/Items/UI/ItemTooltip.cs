@@ -21,6 +21,7 @@ public class ItemTooltip : MonoBehaviour
     [SerializeField] private TextMeshProUGUI setInfoText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private RectTransform tooltipRect;
+    [SerializeField] private CanvasGroup tooltipGroup;
 
     [Header("Rarity Colors")]
     [SerializeField] private Color commonColor = Color.gray;
@@ -28,9 +29,6 @@ public class ItemTooltip : MonoBehaviour
     [SerializeField] private Color rareColor = Color.blue;
     [SerializeField] private Color epicColor = Color.magenta;
     [SerializeField] private Color legendaryColor = Color.yellow;
-
-    private Canvas parentCanvas;
-    private RectTransform canvasRect;
 
     private void Awake()
     {
@@ -51,31 +49,34 @@ public class ItemTooltip : MonoBehaviour
             backgroundImage = GetComponent<Image>();
         if (tooltipRect == null)
             tooltipRect = GetComponent<RectTransform>();
+        
+        // CanvasGroup 자동 찾기 또는 생성
+        if (tooltipGroup == null)
+            tooltipGroup = GetComponent<CanvasGroup>();
+        
+        if (tooltipGroup == null)
+            tooltipGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // Canvas 찾기
-        parentCanvas = GetComponentInParent<Canvas>();
-        if (parentCanvas != null)
-        {
-            canvasRect = parentCanvas.GetComponent<RectTransform>();
-        }
-
-        // 초기에는 숨김
-        gameObject.SetActive(false);
+        // 초기에는 숨김 (CanvasGroup으로 관리)
+        tooltipGroup.alpha = 0f;
+        tooltipGroup.blocksRaycasts = false;
+        tooltipGroup.interactable = false;
+        
+        // GameObject는 항상 활성화 상태 유지
+        gameObject.SetActive(true);
     }
 
     /// <summary>
-    /// 아이템 정보를 표시합니다.
+    /// 아이템 데이터를 설정합니다. (표시만 담당)
     /// </summary>
-    public void ShowTooltip(ItemInstance item, Vector2 screenPosition)
+    public void SetData(ItemInstance item)
     {
         if (item == null || item.ItemData == null)
         {
-            HideTooltip();
             return;
         }
 
         ItemData data = item.ItemData;
-        gameObject.SetActive(true);
 
         // 아이템 이름
         if (itemNameText != null)
@@ -137,50 +138,51 @@ public class ItemTooltip : MonoBehaviour
             Color rarityColor = GetRarityColor(data.rarity);
             backgroundImage.color = new Color(rarityColor.r, rarityColor.g, rarityColor.b, 0.9f);
         }
+    }
 
-        // 위치 설정
-        SetTooltipPosition(screenPosition);
+    /// <summary>
+    /// 툴팁을 표시합니다.
+    /// </summary>
+    public void Show()
+    {
+        if (tooltipGroup == null)
+        {
+            Debug.LogError("ItemTooltip: CanvasGroup이 없습니다.");
+            return;
+        }
+
+        // GameObject는 항상 활성화 상태 유지
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
+        // CanvasGroup으로 표시
+        tooltipGroup.alpha = 1f;
+        tooltipGroup.blocksRaycasts = false; // 툴팁은 클릭 대상이 아니므로
+        tooltipGroup.interactable = false;
+        
+        Debug.Log($"ItemTooltip.Show() 완료 - CanvasGroup alpha: {tooltipGroup.alpha}");
     }
 
     /// <summary>
     /// 툴팁을 숨깁니다.
     /// </summary>
-    public void HideTooltip()
+    public void Hide()
     {
-        gameObject.SetActive(false);
-    }
+        if (tooltipGroup == null)
+        {
+            Debug.LogError("ItemTooltip: CanvasGroup이 없습니다.");
+            return;
+        }
 
-    /// <summary>
-    /// 툴팁 위치를 설정합니다.
-    /// </summary>
-    private void SetTooltipPosition(Vector2 screenPosition)
-    {
-        if (tooltipRect == null || canvasRect == null) return;
-
-        Vector2 localPoint;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect, screenPosition, parentCanvas.worldCamera, out localPoint);
-
-        // 마우스 위치 기준으로 오프셋 설정
-        localPoint.x += 10f;
-        localPoint.y += 10f;
-
-        // 화면 밖으로 나가지 않도록 조정
-        float tooltipWidth = tooltipRect.rect.width;
-        float tooltipHeight = tooltipRect.rect.height;
-        float canvasWidth = canvasRect.rect.width;
-        float canvasHeight = canvasRect.rect.height;
-
-        if (localPoint.x + tooltipWidth > canvasWidth * 0.5f)
-            localPoint.x = canvasWidth * 0.5f - tooltipWidth - 10f;
-        if (localPoint.y + tooltipHeight > canvasHeight * 0.5f)
-            localPoint.y = canvasHeight * 0.5f - tooltipHeight - 10f;
-        if (localPoint.x < -canvasWidth * 0.5f)
-            localPoint.x = -canvasWidth * 0.5f + 10f;
-        if (localPoint.y < -canvasHeight * 0.5f)
-            localPoint.y = -canvasHeight * 0.5f + 10f;
-
-        tooltipRect.localPosition = localPoint;
+        // CanvasGroup으로 숨김
+        tooltipGroup.alpha = 0f;
+        tooltipGroup.blocksRaycasts = false;
+        tooltipGroup.interactable = false;
+        
+        // GameObject는 활성화 상태 유지 (레이아웃 계산을 위해)
+        // gameObject.SetActive(false); // 제거됨
     }
 
     /// <summary>

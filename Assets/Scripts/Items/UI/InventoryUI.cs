@@ -312,6 +312,7 @@ public class InventoryUI : MonoBehaviour
             gameObject.SetActive(true);
         else
             gameObject.SetActive(false);
+        TooltipManager.Instance.HideTooltip();
     }
 
 

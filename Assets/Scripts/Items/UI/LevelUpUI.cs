@@ -176,6 +176,7 @@ public class LevelUpUI : MonoBehaviour
         Debug.Log($"레벨업 아이템 선택: {item.ItemData.itemName} (슬롯 {slot.SlotIndex})");
 
         ItemManager.Instance.EquipItem(item);
+        TooltipManager.Instance.HideTooltip();
         OnLevelUpCompleted?.Invoke(this);
     }
 
