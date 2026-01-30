@@ -2383,11 +2383,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6911314382548753542, guid: ea1f78e30a2ea7f4fb36e03f036560e7, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6911314382548753542, guid: ea1f78e30a2ea7f4fb36e03f036560e7, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6911314382548753542, guid: ea1f78e30a2ea7f4fb36e03f036560e7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3806,8 +3806,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TooltipManager
   itemTooltip: {fileID: 1030387695}
   showDelay: 0.3
-  offsetX: 10
-  offsetY: 0
+  offsetX: 150
+  offsetY: 150
   autoPosition: 1
   useUnscaledTime: 1
 --- !u!1 &1884666767

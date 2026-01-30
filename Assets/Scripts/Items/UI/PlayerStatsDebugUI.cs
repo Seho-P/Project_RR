@@ -200,49 +200,23 @@ public class PlayerStatsDebugUI : MonoBehaviour
         // 스탯 변경 시 이전 스탯 업데이트는 아이템 장착/해제 이벤트에서 처리
     }
 
-    private void OnItemEquipped(ItemInstance item)
+    private void OnItemEquipped(ItemInstance item, Dictionary<StatType, float> statsBefore)
     {
-        if (item?.ItemData != null)
+        // 장착 직전 스냅샷을 이전 스탯으로 사용 (플랫+퍼센트 모두 반영된 실제 값)
+        if (statsBefore != null)
         {
-            // 아이템 장착 후 스탯이 변경되었으므로,
-            // 현재 스탯에서 아이템의 플랫 스탯을 빼서 장착 전 스탯을 계산
-            UpdatePreviousStatsFromItem(item, true);
+            foreach (var kvp in statsBefore)
+                previousStats[kvp.Key] = kvp.Value;
         }
     }
 
-    private void OnItemUnequipped(ItemInstance item)
+    private void OnItemUnequipped(ItemInstance item, Dictionary<StatType, float> statsBefore)
     {
-        if (item?.ItemData != null)
+        // 해제 직전 스냅샷을 이전 스탯으로 사용 (플랫+퍼센트 모두 반영된 실제 값)
+        if (statsBefore != null)
         {
-            // 아이템 해제 후 스탯이 변경되었으므로,
-            // 현재 스탯에 아이템의 플랫 스탯을 더해서 해제 전 스탯을 계산
-            UpdatePreviousStatsFromItem(item, false);
-        }
-    }
-
-    private void UpdatePreviousStatsFromItem(ItemInstance item, bool equipped)
-    {
-        // 아이템 장착/해제 전 스탯을 계산하여 저장
-        // 플랫 스탯만 고려하여 간단하게 계산
-        if (playerStats == null || item?.ItemData == null) return;
-
-        var stats = item.GetTotalStats();
-
-        foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
-        {
-            float currentValue = playerStats.GetStat(statType);
-            float itemFlatValue = stats.ContainsKey(statType) ? stats[statType] : 0f;
-
-            if (equipped)
-            {
-                // 장착된 경우: 현재 값에서 아이템 플랫 값을 빼서 장착 전 값 계산
-                previousStats[statType] = currentValue - itemFlatValue;
-            }
-            else
-            {
-                // 해제된 경우: 현재 값에 아이템 플랫 값을 더해서 해제 전 값 계산
-                previousStats[statType] = currentValue + itemFlatValue;
-            }
+            foreach (var kvp in statsBefore)
+                previousStats[kvp.Key] = kvp.Value;
         }
     }
 

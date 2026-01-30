@@ -41,13 +41,13 @@ public class Inventory : MonoBehaviour
         ItemEvents.OnItemEquipped -= HandleItemEquipped;
         ItemEvents.OnItemUnequipped -= HandleItemUnequipped;
     }
-        private void HandleItemEquipped(ItemInstance item)
+        private void HandleItemEquipped(ItemInstance item, System.Collections.Generic.Dictionary<Items.Enums.StatType, float> statsBefore)
     {
         // 장착된 아이템을 인벤토리에 추가
         AddItem(item);
     }
 
-    private void HandleItemUnequipped(ItemInstance item)
+    private void HandleItemUnequipped(ItemInstance item, System.Collections.Generic.Dictionary<Items.Enums.StatType, float> statsBefore)
     {
         // 해제된 아이템을 인벤토리에서 제거
         RemoveItem(item);

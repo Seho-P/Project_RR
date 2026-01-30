@@ -88,9 +88,9 @@ public class ItemManager : MonoBehaviour
 
         equippedItems.Add(item);
 
-        // 스탯 적용 전 현재 스탯 저장 (로깅용)
+        // 스탯 적용 전 현재 스탯 스냅샷 (로깅 + 이벤트용, 퍼센트 포함 실제 값)
         Dictionary<StatType, float> statsBefore = null;
-        if (enableStatLogging && playerStats != null)
+        if (playerStats != null)
         {
             statsBefore = GetCurrentStatsSnapshot();
         }
@@ -107,8 +107,8 @@ public class ItemManager : MonoBehaviour
             LogStatChanges(item, statsBefore, true);
         }
 
-        // 이벤트 발생
-        ItemEvents.InvokeItemEquipped(item);
+        // 이벤트 발생 (장착 직전 스탯 스냅샷 전달)
+        ItemEvents.InvokeItemEquipped(item, statsBefore);
 
         return true;
     }
@@ -124,9 +124,9 @@ public class ItemManager : MonoBehaviour
 
         equippedItems.Remove(item);
 
-        // 스탯 제거 전 현재 스탯 저장 (로깅용)
+        // 스탯 제거 전 현재 스탯 스냅샷 (로깅 + 이벤트용, 퍼센트 포함 실제 값)
         Dictionary<StatType, float> statsBefore = null;
-        if (enableStatLogging && playerStats != null)
+        if (playerStats != null)
         {
             statsBefore = GetCurrentStatsSnapshot();
         }
@@ -143,8 +143,8 @@ public class ItemManager : MonoBehaviour
             LogStatChanges(item, statsBefore, false);
         }
 
-        // 이벤트 발생
-        ItemEvents.InvokeItemUnequipped(item);
+        // 이벤트 발생 (해제 직전 스탯 스냅샷 전달)
+        ItemEvents.InvokeItemUnequipped(item, statsBefore);
 
         return true;
     }
@@ -345,26 +345,28 @@ public class ItemManager : MonoBehaviour
 
         bool hasChanges = false;
 
-        // 모든 스탯 비교
+        // 모든 스탯 비교 (Approximately 사용으로 float 오차 시에도 변화 감지)
         foreach (StatType statType in System.Enum.GetValues(typeof(StatType)))
         {
             float before = statsBefore.ContainsKey(statType) ? statsBefore[statType] : 0f;
             float after = playerStats.GetStat(statType);
             float difference = after - before;
 
-            // 변화가 있는 스탯만 표시
-            if (Mathf.Abs(difference) > 0.01f)
+            // 변화가 있으면 표시 (0.01f 임계값 대신 Approximately로 0.1 같은 값도 확실히 포함)
+            if (!Mathf.Approximately(difference, 0f))
             {
                 string statName = GetStatName(statType);
                 string changeText = difference > 0 ? $"+{difference:F2}" : $"{difference:F2}";
-                log.AppendLine($"  {statName}: {before:F2} → {after:F2} ({changeText})");
+                // Unity 로그창에서 유니코드(→)가 깨질 수 있어 ASCII 화살표 사용
+                log.AppendLine($"  {statName}: {before:F2} -> {after:F2} ({changeText})");
                 hasChanges = true;
             }
         }
 
         if (hasChanges)
         {
-            Debug.Log(log.ToString());
+            // Collapse 시 같은 형식 로그가 묶여 안 보일 수 있어, 접두어로 구분
+            Debug.Log($"[ItemManager 스탯변화]\n{log}");
         }
         else
         {
