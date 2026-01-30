@@ -253,18 +253,10 @@ public class TooltipManager : MonoBehaviour
                 out slotPos);
         }
 
-        // 툴팁 크기 가져오기
-        float tooltipWidth = tooltipRect.rect.width;
-        float tooltipHeight = tooltipRect.rect.height;
-        
-        // 크기가 0이면 기본값 사용
-        if (tooltipWidth <= 0) tooltipWidth = 200f;
-        if (tooltipHeight <= 0) tooltipHeight = 100f;
-
         // 기본 위치 계산 (슬롯 오른쪽)
         Vector2 tooltipPosition = new Vector2(
-            slotPos.x + slotRect.rect.width * 0.5f + tooltipWidth * 0.5f + offsetX,
-            slotPos.y + offsetY
+            slotPos.x + offsetX,
+            slotPos.y
         );
 
         // 자동 위치 조정 (화면 경계 체크)
@@ -274,21 +266,21 @@ public class TooltipManager : MonoBehaviour
             float canvasHeight = canvasRect.rect.height;
 
             // 오른쪽 경계를 넘어가면 왼쪽에 표시
-            if (tooltipPosition.x + tooltipWidth * 0.5f > canvasWidth * 0.5f)
+            if (tooltipPosition.x + offsetX > canvasWidth)
             {
-                tooltipPosition.x = slotPos.x - slotRect.rect.width * 0.5f - tooltipWidth * 0.5f - offsetX;
+                tooltipPosition.x = slotPos.x - offsetX;
             }
 
             // 위쪽 경계를 넘어가면 아래로 조정
-            if (tooltipPosition.y + tooltipHeight * 0.5f > canvasHeight * 0.5f)
+            if (tooltipPosition.y + offsetY > canvasHeight)
             {
-                tooltipPosition.y = canvasHeight * 0.5f - tooltipHeight * 0.5f;
+                tooltipPosition.y = canvasHeight - offsetY;
             }
 
             // 아래쪽 경계를 넘어가면 위로 조정
-            if (tooltipPosition.y - tooltipHeight * 0.5f < -canvasHeight * 0.5f)
+            if (tooltipPosition.y - offsetY < -canvasHeight)
             {
-                tooltipPosition.y = -canvasHeight * 0.5f + tooltipHeight * 0.5f;
+                tooltipPosition.y = -canvasHeight + offsetY;
             }
         }
 
