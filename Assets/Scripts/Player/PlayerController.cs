@@ -1,11 +1,12 @@
 using UnityEngine;
+using Items.Enums;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float baseMoveSpeed = 5f;
 
     [Header("Dodge")]
     [SerializeField] private float dodgeDistance = 3f;
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Refs")]
     [SerializeField] private WeaponHolder weaponHolder;
+    [SerializeField] private PlayerStats playerStats;
 
     private Rigidbody2D rb;
     private Collider2D playerCollider;
@@ -34,7 +36,7 @@ public class PlayerController : MonoBehaviour
     // Properties
     public Rigidbody2D Rigidbody => rb;
     public WeaponHolder WeaponHolder => weaponHolder;
-    public float MoveSpeed => moveSpeed;
+    public float MoveSpeed => GetMoveSpeed();
     public float DodgeDistance => dodgeDistance;
     public float DodgeDuration => dodgeDuration;
     public float InvincibilityDuration => invincibilityDuration;
@@ -54,6 +56,20 @@ public class PlayerController : MonoBehaviour
         if (weaponHolder == null)
         {
             weaponHolder = GetComponentInChildren<WeaponHolder>();
+        }
+
+        // PlayerStats 찾기 (같은 GameObject 또는 자식에서)
+        if (playerStats == null)
+        {
+            playerStats = GetComponent<PlayerStats>();
+            if (playerStats == null)
+            {
+                playerStats = GetComponentInParent<PlayerStats>();
+            }
+            if (playerStats == null)
+            {
+                playerStats = FindFirstObjectByType<PlayerStats>();
+            }
         }
     }
 
@@ -87,7 +103,7 @@ public class PlayerController : MonoBehaviour
         // 이동 처리 (회피 상태가 아닐 때만)
         if (currentState != dodgeState)
         {
-            rb.linearVelocity = moveDirection * moveSpeed;
+            rb.linearVelocity = moveDirection * GetMoveSpeed();
         }
     }
 
@@ -168,5 +184,18 @@ public class PlayerController : MonoBehaviour
         Vector2 dir = (mouseWorld - weaponHolder.FirePoint.position);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
+    }
+
+    /// <summary>
+    /// 현재 이동 속도를 가져옵니다 (기본값 + PlayerStats의 MoveSpeed 스탯)
+    /// </summary>
+    private float GetMoveSpeed()
+    {
+        float statBonus = 0f;
+        if (playerStats != null)
+        {
+            statBonus = playerStats.GetStat(StatType.MoveSpeed);
+        }
+        return baseMoveSpeed + statBonus;
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using Items.Data;
 using Items.Enums;
@@ -9,7 +10,7 @@ using Items.Enums;
 /// 인벤토리, 레벨업 선택, 장비 슬롯 등 다양한 용도로 사용 가능
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class ItemSlot : MonoBehaviour
+public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI References")]
     [SerializeField] private Image iconImage;           // 아이템 아이콘
@@ -19,6 +20,9 @@ public class ItemSlot : MonoBehaviour
     [SerializeField] private GameObject enhancementBadge; // 강화 레벨 배지
     [SerializeField] private TextMeshProUGUI enhancementText; // 강화 레벨 텍스트
     [SerializeField] private GameObject emptySlotVisual; // 빈 슬롯 시각 효과
+
+    [Header("Tooltip")]
+    [SerializeField] private bool useTooltipManager = true; // TooltipManager 사용 여부
 
     [Header("Rarity Colors")]
     [SerializeField] private Color commonColor = Color.gray;
@@ -30,6 +34,7 @@ public class ItemSlot : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool showEnhancementLevel = true;
     [SerializeField] private bool showEmptyVisual = true;
+    [SerializeField] private bool enableTooltip = true; // 툴팁 활성화 여부
 
     private Button slotButton;
     private ItemInstance currentItem;
@@ -210,6 +215,71 @@ public class ItemSlot : MonoBehaviour
     public void SetActive(bool active)
     {
         gameObject.SetActive(active);
+    }
+
+    /// <summary>
+    /// 마우스가 슬롯 위에 올라왔을 때 호출
+    /// </summary>
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (!enableTooltip || currentItem == null || currentItem.ItemData == null)
+        {
+            Debug.Log($"ItemSlot: 툴팁 비활성화 또는 아이템 없음 - enableTooltip: {enableTooltip}, currentItem: {currentItem != null}");
+            return;
+        }
+
+        if (useTooltipManager)
+        {
+            // TooltipManager 사용
+            if (TooltipManager.Instance != null)
+            {
+                RectTransform slotRect = GetComponent<RectTransform>();
+                Debug.Log($"ItemSlot: TooltipManager.ShowTooltip 호출 - {currentItem.ItemData.itemName}");
+                TooltipManager.Instance.ShowTooltip(currentItem, slotRect);
+            }
+            else
+            {
+                Debug.LogWarning("ItemSlot: TooltipManager.Instance가 null입니다.");
+            }
+        }
+        else
+        {
+            // 기존 방식 (하위 호환성)
+            ItemTooltip tooltip = FindFirstObjectByType<ItemTooltip>();
+            if (tooltip != null)
+            {
+                RectTransform slotRect = GetComponent<RectTransform>();
+                tooltip.SetData(currentItem);
+                tooltip.Show();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 마우스가 슬롯에서 벗어났을 때 호출
+    /// </summary>
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (!enableTooltip)
+            return;
+
+        if (useTooltipManager)
+        {
+            // TooltipManager 사용
+            if (TooltipManager.Instance != null)
+            {
+                TooltipManager.Instance.HideTooltip();
+            }
+        }
+        else
+        {
+            // 기존 방식 (하위 호환성)
+            ItemTooltip tooltip = FindFirstObjectByType<ItemTooltip>();
+            if (tooltip != null)
+            {
+                tooltip.Hide();
+            }
+        }
     }
 
     // 프로퍼티

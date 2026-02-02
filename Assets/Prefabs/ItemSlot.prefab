@@ -143,6 +143,7 @@ MonoBehaviour:
   enhancementBadge: {fileID: 6218966109192995314}
   enhancementText: {fileID: 7834617490776695011}
   emptySlotVisual: {fileID: 0}
+  useTooltipManager: 1
   commonColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   uncommonColor: {r: 0, g: 1, b: 0, a: 1}
   rareColor: {r: 0, g: 0, b: 1, a: 1}
@@ -150,6 +151,7 @@ MonoBehaviour:
   legendaryColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showEnhancementLevel: 1
   showEmptyVisual: 0
+  enableTooltip: 1
 --- !u!1 &4446871961419856013
 GameObject:
   m_ObjectHideFlags: 0
