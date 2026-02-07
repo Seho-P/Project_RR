@@ -37,6 +37,9 @@ public class PlayerDodgeState : PlayerState
         dodgeDuration = controller.DodgeDuration;
         invincibilityDuration = controller.InvincibilityDuration;
 
+        // 회피 방향에 맞게 애니메이션 업데이트 (스프라이트 Flip 포함)
+        controller.UpdateAnimation(dodgeDirection);
+
         // 회피 코루틴 시작
         dodgeCoroutine = controller.StartCoroutine(PerformDodge());
     }

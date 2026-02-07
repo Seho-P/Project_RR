@@ -23,7 +23,10 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D playerCollider;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     private Vector2 moveDirection;
+    private Vector2 lastFacingDirection = Vector2.down; // 마지막으로 바라본 방향 (기본: 아래)
     private bool isInvincible;
     private int defaultLayer;
 
@@ -35,12 +38,15 @@ public class PlayerController : MonoBehaviour
 
     // Properties
     public Rigidbody2D Rigidbody => rb;
+    public Animator Animator => animator;
+    public SpriteRenderer SpriteRenderer => spriteRenderer;
     public WeaponHolder WeaponHolder => weaponHolder;
     public float MoveSpeed => GetMoveSpeed();
     public float DodgeDistance => dodgeDistance;
     public float DodgeDuration => dodgeDuration;
     public float InvincibilityDuration => invincibilityDuration;
     public bool IsInvincible => isInvincible;
+    public Vector2 LastFacingDirection => lastFacingDirection;
 
     // State 접근자
     public PlayerIdleState IdleState => idleState;
@@ -50,8 +56,16 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.freezeRotation = true; // 벽 충돌 시 물리 회전 방지
         playerCollider = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         defaultLayer = gameObject.layer;
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
         
         if (weaponHolder == null)
         {
@@ -120,6 +134,32 @@ public class PlayerController : MonoBehaviour
         moveDirection = direction;
     }
 
+    /// <summary>
+    /// 애니메이션 파라미터를 업데이트하고, 왼쪽 이동 시 스프라이트를 뒤집습니다.
+    /// </summary>
+    public void UpdateAnimation(Vector2 moveInput)
+    {
+        if (animator == null) return;
+
+        // 이동 중이면 마지막 방향 갱신
+        if (moveInput.magnitude > 0.01f)
+        {
+            lastFacingDirection = moveInput;
+        }
+
+        // Animator 파라미터 설정
+        // MoveX: 오른쪽 모션만 있으므로 항상 절대값 사용 (Blend Tree에서 양수만 사용)
+        animator.SetFloat("MoveX", Mathf.Abs(lastFacingDirection.x));
+        animator.SetFloat("MoveY", lastFacingDirection.y);
+        animator.SetFloat("Speed", moveInput.magnitude);
+
+        // 왼쪽으로 이동할 때 스프라이트 뒤집기
+        if (spriteRenderer != null && Mathf.Abs(moveInput.x) > 0.01f)
+        {
+            spriteRenderer.flipX = moveInput.x < 0f;
+        }
+    }
+
     public void SetInvincible(bool invincible)
     {
         isInvincible = invincible;
@@ -183,7 +223,8 @@ public class PlayerController : MonoBehaviour
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 dir = (mouseWorld - weaponHolder.FirePoint.position);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        // 플레이어 전체가 아닌 무기(WeaponHolder)만 회전
+        weaponHolder.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     /// <summary>

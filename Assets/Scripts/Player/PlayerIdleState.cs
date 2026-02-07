@@ -9,6 +9,8 @@ public class PlayerIdleState : PlayerState
     public override void Enter()
     {
         controller.SetMoveDirection(Vector2.zero);
+        // Idle 상태 진입 시 Speed를 0으로 설정 (마지막 방향은 유지)
+        controller.UpdateAnimation(Vector2.zero);
     }
 
     public override void Tick()
