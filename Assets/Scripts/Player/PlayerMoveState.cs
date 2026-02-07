@@ -14,6 +14,9 @@ public class PlayerMoveState : PlayerState
         Vector2 moveInput = new Vector2(x, y).normalized;
         controller.SetMoveDirection(moveInput);
 
+        // 애니메이션 업데이트 (방향 + Speed + 스프라이트 Flip)
+        controller.UpdateAnimation(moveInput);
+
         // 이동 입력이 없으면 Idle 상태로 전환
         if (moveInput.magnitude < 0.01f)
         {
