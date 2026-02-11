@@ -25,6 +25,7 @@ public class EnemyController : MonoBehaviour
     private Rigidbody2D rb;
     private Transform currentTarget;
     private Health health;
+    private IEnemyAnimator enemyAnimator;
 
     private EnemyIdleState idleState;
     private EnemyChaseState chaseState;
@@ -37,6 +38,7 @@ public class EnemyController : MonoBehaviour
     public float AttackRange => attackRange;
     public float AttackCooldown => attackCooldown;
     public float MaxChaseRange => maxChaseRange;
+    public Vector2 MoveDirection => moveDirection;
     public EnemyIdleState IdleState => idleState;
     public EnemyChaseState ChaseState => chaseState;
     public EnemyAttackState AttackState => attackState;
@@ -49,6 +51,9 @@ public class EnemyController : MonoBehaviour
             weaponHolder = GetComponentInChildren<WeaponHolder>();
         }
         currentTarget = initialTarget;
+
+        // IEnemyAnimator 전략 컴포넌트 자동 탐색
+        enemyAnimator = GetComponent<IEnemyAnimator>();
     }
 
     private void Start()
@@ -75,6 +80,7 @@ public class EnemyController : MonoBehaviour
     private void Update()
     {
         currentState?.Tick();
+        enemyAnimator?.UpdateAnimation(moveDirection);
     }
 
     private void FixedUpdate()
@@ -157,9 +163,19 @@ public class EnemyController : MonoBehaviour
     public void FaceTarget()
     {
         if (!HasTarget) return;
-        Vector2 dir = (currentTarget.position - weaponHolder.FirePoint.position).normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        Vector2 dir = ((Vector2)currentTarget.position - rb.position).normalized;
+
+        // 스프라이트 방향 처리는 IEnemyAnimator에 위임 (flip 등)
+        enemyAnimator?.FaceDirection(dir);
+
+        // 무기가 있으면 weaponHolder만 회전 (PlayerController의 RotateToMouse와 동일 방식)
+        if (weaponHolder != null)
+        {
+            Vector2 weaponDir = (currentTarget.position - weaponHolder.FirePoint.position).normalized;
+            float angle = Mathf.Atan2(weaponDir.y, weaponDir.x) * Mathf.Rad2Deg;
+            weaponHolder.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
     }
 
      public bool TryAttack()
