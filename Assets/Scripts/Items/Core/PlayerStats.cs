@@ -223,5 +223,31 @@ public class PlayerStats : MonoBehaviour
         ClearSetBonusStats();
         // ClearItemStats와 ClearSetBonusStats에서 이미 갱신하므로 추가 갱신 불필요
     }
+
+    /// <summary>
+    /// 기본 스탯 스냅샷을 반환한다.
+    /// </summary>
+    public Dictionary<StatType, float> GetBaseStatsSnapshot()
+    {
+        return new Dictionary<StatType, float>(baseStats);
+    }
+
+    /// <summary>
+    /// 저장된 기본 스탯을 적용한다.
+    /// </summary>
+    public void LoadBaseStatsSnapshot(Dictionary<StatType, float> snapshot)
+    {
+        if (snapshot == null || snapshot.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var kvp in snapshot)
+        {
+            baseStats[kvp.Key] = kvp.Value;
+        }
+
+        UpdateAllFinalStats();
+    }
 }
 

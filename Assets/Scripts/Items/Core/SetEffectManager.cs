@@ -17,8 +17,16 @@ public class SetEffectManager : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         if (playerStats == null)
         {
-            Debug.LogError("SetEffectManager: PlayerStats 컴포넌트를 찾을 수 없습니다!");
+            Debug.LogWarning("SetEffectManager: PlayerStats 컴포넌트를 찾을 수 없습니다. 런타임에 바인딩될 수 있습니다.");
         }
+    }
+
+    /// <summary>
+    /// 씬 전환 후 새 플레이어의 PlayerStats를 바인딩한다.
+    /// </summary>
+    public void BindPlayerStats(PlayerStats newPlayerStats)
+    {
+        playerStats = newPlayerStats;
     }
 
     // 세트 개수 업데이트
