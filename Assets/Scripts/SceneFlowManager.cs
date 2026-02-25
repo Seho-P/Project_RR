@@ -179,8 +179,38 @@ public class SceneFlowManager : MonoBehaviour
             Debug.LogWarning($"[SceneFlowManager] 스폰 포인트를 찾지 못해 원점에 스폰합니다. scene={scene.name}, spawnId={pendingSpawnId}");
         }
 
-        Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+        GameObject playerObject = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+        BindPlayerHealthUI(playerObject);
         pendingSpawnId = string.Empty;
+    }
+
+    private void BindPlayerHealthUI(GameObject playerObject)
+    {
+        if (playerObject == null)
+        {
+            return;
+        }
+
+        Health playerHealth = playerObject.GetComponent<Health>();
+        if (playerHealth == null)
+        {
+            playerHealth = playerObject.GetComponentInChildren<Health>();
+        }
+
+        if (playerHealth == null)
+        {
+            Debug.LogWarning("[SceneFlowManager] 생성된 플레이어에서 Health를 찾지 못했습니다.");
+            return;
+        }
+
+        PlayerHealthUI playerHealthUI = FindFirstObjectByType<PlayerHealthUI>();
+        if (playerHealthUI == null)
+        {
+            Debug.LogWarning("[SceneFlowManager] PlayerHealthUI를 찾지 못해 체력 HUD 바인딩을 건너뜁니다.");
+            return;
+        }
+
+        playerHealthUI.Bind(playerHealth);
     }
 
     private bool TryGetSpawnPoint(string sceneName, string preferredSpawnId, out PlayerSpawnPoint point)
