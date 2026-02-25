@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -79,7 +78,7 @@ public class CameraManager : MonoBehaviour
 
             if (cinemachineCamera != null && playerTransform != null)
             {
-                ApplyTarget(cinemachineCamera, playerTransform);
+                BindPlayerCamera(playerTransform);
                 yield break;
             }
 
@@ -110,46 +109,9 @@ public class CameraManager : MonoBehaviour
         return null;
     }
 
-    private void ApplyTarget(Component cameraComponent, Transform target)
+    private void BindPlayerCamera(Transform target)
     {
-        // Cinemachine 버전에 따라 멤버명이 다를 수 있어 반사로 안전하게 설정한다.
-        bool appliedTracking = SetTransformMember(cameraComponent, "TrackingTarget", target);
-        bool appliedFollow = SetTransformMember(cameraComponent, "Follow", target);
-        bool appliedLookAt = alsoSetLookAt && SetTransformMember(cameraComponent, "LookAt", target);
-
-        if (!appliedTracking && !appliedFollow && !appliedLookAt)
-        {
-            Debug.LogWarning("[CameraManager] 카메라 타겟 멤버를 찾지 못했습니다. (TrackingTarget/Follow/LookAt)");
-            return;
-        }
-
-        Debug.Log($"[CameraManager] 카메라 타겟 연결 완료: {target.name}");
-    }
-
-    private static bool SetTransformMember(Component targetComponent, string memberName, Transform value)
-    {
-        if (targetComponent == null)
-        {
-            return false;
-        }
-
-        var type = targetComponent.GetType();
-        const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-
-        PropertyInfo property = type.GetProperty(memberName, flags);
-        if (property != null && property.CanWrite && typeof(Transform).IsAssignableFrom(property.PropertyType))
-        {
-            property.SetValue(targetComponent, value);
-            return true;
-        }
-
-        FieldInfo field = type.GetField(memberName, flags);
-        if (field != null && typeof(Transform).IsAssignableFrom(field.FieldType))
-        {
-            field.SetValue(targetComponent, value);
-            return true;
-        }
-
-        return false;
+        cinemachineCamera.Follow = target;
+        cinemachineCamera.ForceCameraPosition(target.position, Quaternion.identity);
     }
 }
