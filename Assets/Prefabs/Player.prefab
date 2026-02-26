@@ -177,8 +177,6 @@ GameObject:
   - component: {fileID: 4717822453806830385}
   - component: {fileID: 6965672728140187829}
   - component: {fileID: 5731076663880564743}
-  - component: {fileID: 4891399138977922288}
-  - component: {fileID: 7823150292916354515}
   - component: {fileID: 6306946064827808187}
   - component: {fileID: 2639290728324247181}
   - component: {fileID: 8172032639547645396}
@@ -380,33 +378,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037de1a37abe9404e828663327762b93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
---- !u!114 &4891399138977922288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2846964496677907773}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13fdfaba62e2613479806168d5ce9510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemManager
-  playerStats: {fileID: 5731076663880564743}
-  setEffectManager: {fileID: 7823150292916354515}
-  enableStatLogging: 1
---- !u!114 &7823150292916354515
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2846964496677907773}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84186bc5739067245b4e6510d26d8ca8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SetEffectManager
 --- !u!114 &6306946064827808187
 MonoBehaviour:
   m_ObjectHideFlags: 0

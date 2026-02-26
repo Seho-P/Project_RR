@@ -182,49 +182,15 @@ public class ItemManager : MonoBehaviour
     // 아이템 스탯 적용
     private void ApplyItemStats(ItemInstance item)
     {
-        if (playerStats == null || item.ItemData == null) return;
-
-        var stats = item.GetTotalStats();
-        var percentageBonuses = item.GetPercentageBonuses();
-
-        foreach (var kvp in stats)
-        {
-            float percentage = percentageBonuses.ContainsKey(kvp.Key) ? percentageBonuses[kvp.Key] : 0f;
-            playerStats.AddItemStat(kvp.Key, kvp.Value, percentage);
-        }
-
-        // 퍼센트만 있는 옵션도 처리
-        foreach (var kvp in percentageBonuses)
-        {
-            if (!stats.ContainsKey(kvp.Key))
-            {
-                playerStats.AddItemStat(kvp.Key, 0f, kvp.Value);
-            }
-        }
+        if (playerStats == null) return;
+        playerStats.ApplyItem(item);
     }
 
     // 아이템 스탯 제거
     private void RemoveItemStats(ItemInstance item)
     {
-        if (playerStats == null || item.ItemData == null) return;
-
-        var stats = item.GetTotalStats();
-        var percentageBonuses = item.GetPercentageBonuses();
-
-        foreach (var kvp in stats)
-        {
-            float percentage = percentageBonuses.ContainsKey(kvp.Key) ? percentageBonuses[kvp.Key] : 0f;
-            playerStats.RemoveItemStat(kvp.Key, kvp.Value, percentage);
-        }
-
-        // 퍼센트만 있는 옵션도 처리
-        foreach (var kvp in percentageBonuses)
-        {
-            if (!stats.ContainsKey(kvp.Key))
-            {
-                playerStats.RemoveItemStat(kvp.Key, 0f, kvp.Value);
-            }
-        }
+        if (playerStats == null) return;
+        playerStats.RemoveItem(item);
     }
 
     // 장착된 아이템 목록 가져오기
