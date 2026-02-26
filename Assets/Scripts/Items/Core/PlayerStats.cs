@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Items.Data;
 using Items.Enums;
 
 public class PlayerStats : MonoBehaviour
@@ -69,6 +70,21 @@ public class PlayerStats : MonoBehaviour
         UpdateFinalStat(type);
     }
 
+    /// <summary>
+    /// 아이템 인스턴스의 스탯을 적용한다.
+    /// </summary>
+    public void ApplyItem(ItemInstance item)
+    {
+        if (item?.ItemData == null)
+        {
+            return;
+        }
+
+        var stats = item.GetTotalStats();
+        var percentageBonuses = item.GetPercentageBonuses();
+        ApplyStatModifiers(stats, percentageBonuses, true);
+    }
+
     // 아이템 스탯 제거
     public void RemoveItemStat(StatType type, float flatValue, float percentageValue = 0f)
     {
@@ -88,6 +104,71 @@ public class PlayerStats : MonoBehaviour
         
         // 최종 스탯 갱신
         UpdateFinalStat(type);
+    }
+
+    /// <summary>
+    /// 아이템 인스턴스의 스탯을 제거한다.
+    /// </summary>
+    public void RemoveItem(ItemInstance item)
+    {
+        if (item?.ItemData == null)
+        {
+            return;
+        }
+
+        var stats = item.GetTotalStats();
+        var percentageBonuses = item.GetPercentageBonuses();
+        ApplyStatModifiers(stats, percentageBonuses, false);
+    }
+
+    /// <summary>
+    /// 플랫/퍼센트 보너스 딕셔너리를 일괄 적용/제거한다.
+    /// </summary>
+    private void ApplyStatModifiers(
+        Dictionary<StatType, float> flatStats,
+        Dictionary<StatType, float> percentageBonuses,
+        bool isApply)
+    {
+        if (flatStats == null)
+        {
+            flatStats = new Dictionary<StatType, float>();
+        }
+
+        if (percentageBonuses == null)
+        {
+            percentageBonuses = new Dictionary<StatType, float>();
+        }
+
+        foreach (var kvp in flatStats)
+        {
+            float percentage = percentageBonuses.ContainsKey(kvp.Key) ? percentageBonuses[kvp.Key] : 0f;
+            if (isApply)
+            {
+                AddItemStat(kvp.Key, kvp.Value, percentage);
+            }
+            else
+            {
+                RemoveItemStat(kvp.Key, kvp.Value, percentage);
+            }
+        }
+
+        // 퍼센트만 있는 옵션도 처리
+        foreach (var kvp in percentageBonuses)
+        {
+            if (flatStats.ContainsKey(kvp.Key))
+            {
+                continue;
+            }
+
+            if (isApply)
+            {
+                AddItemStat(kvp.Key, 0f, kvp.Value);
+            }
+            else
+            {
+                RemoveItemStat(kvp.Key, 0f, kvp.Value);
+            }
+        }
     }
 
     // 아이템 스탯 초기화

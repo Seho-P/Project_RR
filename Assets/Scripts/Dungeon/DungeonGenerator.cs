@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// 던전 생성기: Random Walk 알고리즘으로 방 그래프를 생성하고,
@@ -9,8 +10,7 @@ using UnityEngine;
 /// [배치 좌표 체계]
 /// - 그리드 좌표 (0,0)이 시작 방
 /// - 월드 좌표 = 그리드 좌표 × 방 크기(22, 16)
-/// - 방 프리팹의 Grid 원점이 (0,0)이고 타일이 (0,0)~(21,15)에 배치된 경우,
-///   방의 시각적 중심은 프리팹 위치 + (11, 8)이 된다.
+/// - 방 프리팹의 Grid 원점이 (0,0)이고 타일이 (-11,-8)~(11,8)에 배치됨 (프리팹 중심은 (0,0))   
 /// </summary>
 public class DungeonGenerator : MonoBehaviour
 {
@@ -36,12 +36,29 @@ public class DungeonGenerator : MonoBehaviour
     [Header("=== 방 레이아웃 ===")]
     [Tooltip("방 프리팹의 타일 크기 (가로 × 세로)")]
     [SerializeField] private Vector2 roomSize = new Vector2(22f, 16f);
-    [Tooltip("프리팹 원점(0,0)에서 방 중심까지의 오프셋\n(타일이 (0,0)~(21,15)에 배치된 경우 (11, 8))")]
-    [SerializeField] private Vector2 roomCenterOffset = new Vector2(11f, 8f);
+    [Tooltip("프리팹 원점(0,0)에서 방 중심까지의 오프셋\n(프리팹 중심이 원점이면 (0,0))")]
+    [SerializeField] private Vector2 roomCenterOffset = Vector2.zero;
 
     [Header("=== 플레이어 ===")]
     [Tooltip("플레이어 Transform (시작 방 중심에 자동 배치)")]
     [SerializeField] private Transform playerTransform;
+
+    [Header("=== 카메라 경계 ===")]
+    [Tooltip("던전 외곽 AABB 경계 생성기 (Cinemachine Confiner 2D용)")]
+    [SerializeField] private DungeonAABBBoundsBuilder cameraBoundsBuilder;
+
+    [Header("=== 배경 타일 채우기 ===")]
+    [Tooltip("빈 공간을 채울 배경 Tilemap")]
+    [SerializeField] private Tilemap backgroundTilemap;
+    [Tooltip("배경으로 깔 Tile 에셋")]
+    [SerializeField] private TileBase backgroundGridTile;
+    [Tooltip("방 그리드 min/max에서 바깥으로 확장할 여유 칸 수")]
+    [Min(0)]
+    [SerializeField] private int backgroundPaddingCells = 1;
+    [Tooltip("배경 Tilemap 정렬 레이어 이름(방보다 뒤로)")]
+    [SerializeField] private string backgroundSortingLayer = "Background";
+    [Tooltip("배경 Tilemap 정렬 순서(방보다 작은 값)")]
+    [SerializeField] private int backgroundOrderInLayer = -10;
 
     // 4방향 상수
     private static readonly Vector2Int[] Directions =
@@ -91,7 +108,13 @@ public class DungeonGenerator : MonoBehaviour
         // 4단계: 연결 정보에 따라 문 설정
         SetupAllDoors();
 
-        // 5단계: 플레이어 시작 위치 설정
+        // 5단계: 빈 그리드 셀에 배경 타일 채우기
+        FillBackgroundGridTiles();
+
+        // 6단계: 카메라 경계 갱신
+        UpdateCameraBounds();
+
+        // 7단계: 플레이어 시작 위치 설정
         PositionPlayer();
 
         Debug.Log($"[DungeonGenerator] 던전 생성 완료! 총 {roomMap.Count}개 방");
@@ -353,7 +376,7 @@ public class DungeonGenerator : MonoBehaviour
 
     /// <summary>
     /// 시작 방의 월드 중심 좌표를 반환한다.
-    /// (프리팹 배치 좌표 + roomCenterOffset)
+    /// (프리팹 중심이 원점이면 roomCenterOffset은 (0,0))
     /// </summary>
     public Vector3 GetStartRoomWorldCenter()
     {
@@ -377,6 +400,64 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     /// <summary>
+    /// 생성된 방 데이터를 기반으로 카메라 경계를 갱신한다.
+    /// </summary>
+    private void UpdateCameraBounds()
+    {
+        if (cameraBoundsBuilder == null) return;
+        cameraBoundsBuilder.RebuildBounds(roomMap, roomSize);
+    }
+
+    /// <summary>
+    /// roomMap 기준으로 비어 있는 그리드 셀에 배경 타일을 채운다.
+    /// </summary>
+   private void FillBackgroundGridTiles()
+    {
+        if (backgroundTilemap == null || backgroundGridTile == null || roomMap.Count == 0)
+            return;
+
+        backgroundTilemap.ClearAllTiles();
+        backgroundTilemap.color = new Color(0.65f, 0.65f, 0.65f, 1f); // 밝기만 낮춤
+        GetRoomGridBounds(out int minX, out int maxX, out int minY, out int maxY);
+
+        minX -= backgroundPaddingCells;
+        maxX += backgroundPaddingCells;
+        minY -= backgroundPaddingCells;
+        maxY += backgroundPaddingCells;
+
+        Debug.Log($"minX: {minX}, maxX: {maxX}, minY: {minY}, maxY: {maxY}");
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            for (int y = minY; y <= maxY; y++)
+            {
+                Vector3Int tilePos = new Vector3Int(x, y, 0);
+                backgroundTilemap.SetTile(tilePos, backgroundGridTile);
+            }
+        }
+    }
+    /// <summary>
+    /// grid 기준으로 상하좌우 좌표 중 가장 작은 값과 가장 큰 값을 반환한다.
+    /// </summary>
+    private void GetRoomGridBounds(out int minX, out int maxX, out int minY, out int maxY)
+    {
+        minX = int.MaxValue;
+        maxX = int.MinValue;
+        minY = int.MaxValue;
+        maxY = int.MinValue;
+
+        foreach (Vector2Int roomPos in roomMap.Keys)
+        {
+            if (roomPos.x < minX) minX = roomPos.x;
+            if (roomPos.x > maxX) maxX = roomPos.x;
+            if (roomPos.y < minY) minY = roomPos.y;
+            if (roomPos.y > maxY) maxY = roomPos.y;
+        }
+    }
+
+
+
+    /// <summary>
     /// 생성된 던전을 모두 제거한다.
     /// </summary>
     public void ClearDungeon()
@@ -391,6 +472,11 @@ public class DungeonGenerator : MonoBehaviour
 
         roomMap.Clear();
         roomControllers.Clear();
+
+        if (backgroundTilemap != null)
+        {
+            backgroundTilemap.ClearAllTiles();
+        }
     }
 
     #endregion

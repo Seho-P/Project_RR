@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class DungeonentranceTrigger : MonoBehaviour
 {
@@ -14,7 +13,7 @@ public class DungeonentranceTrigger : MonoBehaviour
         if (Input.GetKeyDown(interactKey))
         {
             Debug.Log("Player pressed the interact key");
-            SceneManager.LoadScene("Dungeon");
+            SceneFlowManager.Instance.GoToDungeon();
         }
     }
 
