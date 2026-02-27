@@ -6,10 +6,16 @@ public class DungeonentranceTrigger : MonoBehaviour
 
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string playerTag = "Player";
+    private bool isPlayerInRange;
 
 
     private void Update()
     {
+        if (!isPlayerInRange)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(interactKey))
         {
             Debug.Log("Player pressed the interact key");
@@ -21,16 +27,17 @@ public class DungeonentranceTrigger : MonoBehaviour
     {
         if (other.CompareTag(playerTag))
         {
+            isPlayerInRange = true;
             Debug.Log("Player entered the dungeon entrance");
         }
     }
     
-    // private void OnTriggerExit2D(Collider2D other)
-    // {
-    //     if (other.CompareTag(playerTag))
-    //     {
-    //         dungeonEntrance.SetActive(false);
-    //     }
-    // }
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag(playerTag))
+        {
+            isPlayerInRange = false;
+        }
+    }
 
 }

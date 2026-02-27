@@ -207,10 +207,17 @@ public class SceneFlowManager : MonoBehaviour
         if (playerHealthUI == null)
         {
             Debug.LogWarning("[SceneFlowManager] PlayerHealthUI를 찾지 못해 체력 HUD 바인딩을 건너뜁니다.");
-            return;
+        }
+        else
+        {
+            playerHealthUI.Bind(playerHealth);
         }
 
-        playerHealthUI.Bind(playerHealth);
+        GameOverUI gameOverUI = FindFirstObjectByType<GameOverUI>();
+        if (gameOverUI != null)
+        {
+            gameOverUI.Bind(playerHealth);
+        }
     }
 
     private bool TryGetSpawnPoint(string sceneName, string preferredSpawnId, out PlayerSpawnPoint point)

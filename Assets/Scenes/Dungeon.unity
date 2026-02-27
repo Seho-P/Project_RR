@@ -643,7 +643,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonAABBBoundsBuilder
   boundaryObjectName: CameraBoundary_AABB
-  padding: 0
+  padding: 1
   cameraBoundary: {fileID: 1281964097}
 --- !u!1 &850051015
 GameObject:

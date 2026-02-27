@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// 개별 방의 문(Door)을 관리하는 컨트롤러.
@@ -22,6 +24,13 @@ using UnityEngine;
 /// </summary>
 public class RoomController : MonoBehaviour
 {
+    public enum RoomCombatState
+    {
+        Unvisited,
+        CombatActive,
+        Cleared
+    }
+
     [Header("=== 문 (Door) 참조 ===")]
     [Tooltip("윗쪽 문 (위 방으로 연결)")]
     [SerializeField] private Door doorTop;
@@ -32,10 +41,54 @@ public class RoomController : MonoBehaviour
     [Tooltip("오른쪽 문 (오른쪽 방으로 연결)")]
     [SerializeField] private Door doorRight;
 
+    [Header("=== 방 진입/전투 ===")]
+    [Tooltip("플레이어 방 진입을 감지하는 트리거")]
+    [SerializeField] private RoomEnterTrigger roomEnterTrigger;
+    [Tooltip("적 스폰 포인트들의 부모 오브젝트(자식들을 포인트로 사용)")]
+    [SerializeField] private Transform enemySpawnPointsRoot;
+    [Tooltip("방 진입 시 스폰할 적 프리팹 목록")]
+    [SerializeField] private GameObject[] enemyPrefabs;
+
     /// <summary>
     /// 이 방에 대응하는 그래프 데이터
     /// </summary>
     public RoomData Data { get; private set; }
+    public RoomCombatState CombatState { get; private set; } = RoomCombatState.Unvisited;
+
+    private readonly List<Health> aliveEnemies = new List<Health>();
+    private readonly Dictionary<Health, Action> deathHandlers = new Dictionary<Health, Action>();
+
+    private void Awake()
+    {
+        if (roomEnterTrigger == null)
+        {
+            roomEnterTrigger = GetComponentInChildren<RoomEnterTrigger>(true);
+        }
+    }
+
+    /// <summary>
+    /// 방 진입 이벤트 구독을 시작한다.
+    /// </summary>
+    private void OnEnable()
+    {
+        if (roomEnterTrigger != null)
+        {
+            roomEnterTrigger.PlayerEntered += HandlePlayerEntered;
+        }
+    }
+
+    /// <summary>
+    /// 이벤트 구독을 해제하고 전투 이벤트 핸들러를 정리한다.
+    /// </summary>
+    private void OnDisable()
+    {
+        if (roomEnterTrigger != null)
+        {
+            roomEnterTrigger.PlayerEntered -= HandlePlayerEntered;
+        }
+
+        CleanupEnemySubscriptions();
+    }
 
     /// <summary>
     /// DungeonGenerator가 방 생성 시 호출. 그래프 데이터를 연결한다.
@@ -43,6 +96,7 @@ public class RoomController : MonoBehaviour
     public void Initialize(RoomData data)
     {
         Data = data;
+        CombatState = CanStartCombat() ? RoomCombatState.Unvisited : RoomCombatState.Cleared;
     }
 
     /// <summary>
@@ -58,6 +112,9 @@ public class RoomController : MonoBehaviour
         SetDoor(doorRight, Vector2Int.right, data);
     }
 
+    /// <summary>
+    /// 특정 방향의 문을 연결 여부에 맞춰 연다/닫는다.
+    /// </summary>
     private void SetDoor(Door door, Vector2Int direction, RoomData data)
     {
         if (door == null) return;
@@ -84,5 +141,157 @@ public class RoomController : MonoBehaviour
     {
         if (Data != null)
             SetupDoors(Data);
+    }
+
+    /// <summary>
+    /// 플레이어가 방 진입 트리거를 통과했을 때 전투 시작을 시도한다.
+    /// </summary>
+    private void HandlePlayerEntered(Collider2D other)
+    {
+        if (other == null)
+        {
+            return;
+        }
+
+        TryStartCombat();
+    }
+
+    /// <summary>
+    /// 현재 상태가 미방문일 때만 방 전투를 시작한다.
+    /// </summary>
+    private void TryStartCombat()
+    {
+        if (CombatState != RoomCombatState.Unvisited)
+        {
+            return;
+        }
+
+        if (!CanStartCombat())
+        {
+            CombatState = RoomCombatState.Cleared;
+            return;
+        }
+
+        SpawnEnemies();
+
+        if (aliveEnemies.Count == 0)
+        {
+            CombatState = RoomCombatState.Cleared;
+            return;
+        }
+
+        CombatState = RoomCombatState.CombatActive;
+        LockAllDoors();
+    }
+
+    /// <summary>
+    /// 이 방에서 전투를 시작할 수 있는지 조건을 검사한다.
+    /// </summary>
+    private bool CanStartCombat()
+    {
+        if (Data == null)
+        {
+            return false;
+        }
+
+        // 시작 방은 입장 직후 전투를 열지 않는다.
+        if (Data.RoomType == RoomType.Start)
+        {
+            return false;
+        }
+
+        if (enemySpawnPointsRoot == null || enemySpawnPointsRoot.childCount == 0)
+        {
+            return false;
+        }
+
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 스폰 포인트마다 적을 생성하고 사망 이벤트를 등록한다.
+    /// </summary>
+    private void SpawnEnemies()
+    {
+        CleanupEnemySubscriptions();
+        aliveEnemies.Clear();
+
+        int spawnPointCount = enemySpawnPointsRoot.childCount;
+        for (int i = 0; i < spawnPointCount; i++)
+        {
+            Transform spawnPoint = enemySpawnPointsRoot.GetChild(i);
+            GameObject enemyPrefab = enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Length)];
+            if (enemyPrefab == null)
+            {
+                continue;
+            }
+
+            GameObject enemyObject = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity, transform);
+            Health enemyHealth = enemyObject.GetComponent<Health>();
+            if (enemyHealth == null)
+            {
+                enemyHealth = enemyObject.GetComponentInChildren<Health>();
+            }
+
+            if (enemyHealth == null)
+            {
+                Debug.LogWarning($"[RoomController] {enemyObject.name}에서 Health를 찾지 못해 클리어 카운트에서 제외합니다.");
+                continue;
+            }
+
+            aliveEnemies.Add(enemyHealth);
+
+            Action onDeath = null;
+            onDeath = () => HandleEnemyDeath(enemyHealth);
+            deathHandlers[enemyHealth] = onDeath;
+            enemyHealth.OnDeath += onDeath;
+        }
+    }
+
+    /// <summary>
+    /// 적 사망을 반영하고 전투 종료 조건을 확인한다.
+    /// </summary>
+    private void HandleEnemyDeath(Health enemyHealth)
+    {
+        if (enemyHealth == null)
+        {
+            return;
+        }
+
+        if (deathHandlers.TryGetValue(enemyHealth, out Action onDeath))
+        {
+            enemyHealth.OnDeath -= onDeath;
+            deathHandlers.Remove(enemyHealth);
+        }
+
+        aliveEnemies.Remove(enemyHealth);
+
+        if (CombatState == RoomCombatState.CombatActive && aliveEnemies.Count == 0)
+        {
+            CombatState = RoomCombatState.Cleared;
+            UnlockDoors();
+        }
+    }
+
+    /// <summary>
+    /// 등록된 적 사망 이벤트 구독을 모두 해제한다.
+    /// </summary>
+    private void CleanupEnemySubscriptions()
+    {
+        foreach (var pair in deathHandlers)
+        {
+            if (pair.Key != null)
+            {
+                pair.Key.OnDeath -= pair.Value;
+            }
+        }
+
+        deathHandlers.Clear();
+        aliveEnemies.Clear();
     }
 }
