@@ -48,6 +48,8 @@ public class RoomController : MonoBehaviour
     [SerializeField] private Transform enemySpawnPointsRoot;
     [Tooltip("방 진입 시 스폰할 적 프리팹 목록")]
     [SerializeField] private GameObject[] enemyPrefabs;
+    [Tooltip("보스방 전투 클리어 시 활성화할 포탈 오브젝트")]
+    [SerializeField] private GameObject bossClearPortal;
 
     /// <summary>
     /// 이 방에 대응하는 그래프 데이터
@@ -97,6 +99,11 @@ public class RoomController : MonoBehaviour
     {
         Data = data;
         CombatState = CanStartCombat() ? RoomCombatState.Unvisited : RoomCombatState.Cleared;
+
+        if (bossClearPortal != null)
+        {
+            bossClearPortal.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -275,6 +282,23 @@ public class RoomController : MonoBehaviour
         {
             CombatState = RoomCombatState.Cleared;
             UnlockDoors();
+            ActivateBossClearPortalIfNeeded();
+        }
+    }
+
+    /// <summary>
+    /// 보스방 전투가 종료된 경우에만 클리어 포탈을 활성화한다.
+    /// </summary>
+    private void ActivateBossClearPortalIfNeeded()
+    {
+        if (Data == null || Data.RoomType != RoomType.Boss)
+        {
+            return;
+        }
+
+        if (bossClearPortal != null)
+        {
+            bossClearPortal.SetActive(true);
         }
     }
 

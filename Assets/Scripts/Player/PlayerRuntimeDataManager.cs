@@ -31,6 +31,7 @@ public class PlayerRuntimeDataManager : MonoBehaviour
     private PlayerLevelSystem currentLevelSystem;
 
     private bool hasSavedData;
+    private bool ignoreCaptureUntilNextRegister;
     private readonly Dictionary<StatType, float> savedBaseStats = new Dictionary<StatType, float>();
     private readonly List<ItemInstance> savedInventorySlots = new List<ItemInstance>();
     private int savedLevel = 1;
@@ -55,6 +56,9 @@ public class PlayerRuntimeDataManager : MonoBehaviour
         IsQuitting = true;
     }
 
+    /// <summary>
+    /// 씬에서 새로 생성된 플레이어 컴포넌트를 현재 런타임 참조로 등록한다.
+    /// </summary>
     public void RegisterCurrentPlayer(
         PlayerStats playerStats,
         Health health,
@@ -65,10 +69,19 @@ public class PlayerRuntimeDataManager : MonoBehaviour
         currentHealth = health;
         currentInventory = inventory;
         currentLevelSystem = levelSystem;
+        ignoreCaptureUntilNextRegister = false;
     }
 
+    /// <summary>
+    /// 현재 플레이어 상태를 다음 씬 적용용 저장 데이터로 캡처한다.
+    /// </summary>
     public void CaptureCurrentPlayerData()
     {
+        if (ignoreCaptureUntilNextRegister)
+        {
+            return;
+        }
+
         if (currentPlayerStats == null || currentHealth == null || currentInventory == null || currentLevelSystem == null)
         {
             return;
@@ -99,6 +112,24 @@ public class PlayerRuntimeDataManager : MonoBehaviour
         hasSavedData = true;
     }
 
+    /// <summary>
+    /// 저장 데이터가 필요 없는 씬 전환(예: 마을 복귀)을 위해 저장본을 비우고,
+    /// 다음 플레이어 등록 전까지 캡처를 무시하도록 설정한다.
+    /// </summary>
+    public void PrepareForFreshSpawnTransition()
+    {
+        hasSavedData = false;
+        savedBaseStats.Clear();
+        savedInventorySlots.Clear();
+        savedLevel = 1;
+        savedXP = 0;
+        savedCurrentHealth = -1f;
+        ignoreCaptureUntilNextRegister = true;
+    }
+
+    /// <summary>
+    /// 저장된 플레이어 데이터를 현재 씬의 플레이어에 적용한다.
+    /// </summary>
     public void ApplySavedDataToCurrentPlayer()
     {
         if (!hasSavedData)

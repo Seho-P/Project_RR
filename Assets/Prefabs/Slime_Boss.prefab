@@ -137,8 +137,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: -37506199
-  m_SortingOrder: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &6836242119788816530
 MonoBehaviour:
@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 4121425386651169056}
   - component: {fileID: 5458378579905588490}
   m_Layer: 7
-  m_Name: Slime_Normal
+  m_Name: Slime_Boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -241,7 +241,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 34.47, y: -16.19, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 981815294118482061}
@@ -298,7 +298,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 727065752, guid: 886d8b9f107c3e845bd8c9fd0d7b3552, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.12848902, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -356,8 +356,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Offset: {x: -0.05096237, y: -0.1205562}
+  m_Radius: 0.3284801
 --- !u!50 &3979592480065328359
 Rigidbody2D:
   serializedVersion: 5
@@ -422,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b96c72043a5e0f4f9689a5825bc6e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyXPHandler
-  xpAmount: 25
+  xpAmount: 100
   enemyHealth: {fileID: 1951739082927821954}
 --- !u!95 &3485249574651772666
 Animator:

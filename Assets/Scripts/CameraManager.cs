@@ -113,5 +113,26 @@ public class CameraManager : MonoBehaviour
     {
         cinemachineCamera.Follow = target;
         cinemachineCamera.ForceCameraPosition(target.position, Quaternion.identity);
+        RefreshConfinerCache();
+    }
+
+    /// <summary>
+    /// Confiner2D가 현재 경계/렌즈 값을 즉시 반영하도록 캐시를 갱신한다.
+    /// </summary>
+    private void RefreshConfinerCache()
+    {
+        if (cinemachineCamera == null)
+        {
+            return;
+        }
+
+        CinemachineConfiner2D confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
+        if (confiner == null)
+        {
+            return;
+        }
+
+        confiner.InvalidateBoundingShapeCache();
+        confiner.InvalidateLensCache();
     }
 }
