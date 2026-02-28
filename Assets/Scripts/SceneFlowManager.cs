@@ -3,6 +3,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
+/// 트리거나 UI에서 사용하는 씬 이동 목적지.
+/// </summary>
+public enum SceneRoute
+{
+    Lobby,
+    Town,
+    Dungeon
+}
+
+/// <summary>
 /// 씬 전환 + 런타임 플레이어 생성/스폰을 담당한다.
 /// 플레이어 데이터는 PlayerRuntimeDataManager가 유지하고,
 /// 플레이어 오브젝트는 씬 진입 시 새로 생성한다.
@@ -98,12 +108,38 @@ public class SceneFlowManager : MonoBehaviour
         CaptureAndLoadScene(townSceneName, returnToTownSpawnId);
     }
 
+    /// <summary>
+    /// enum으로 전달된 목적지에 따라 씬을 전환한다.
+    /// </summary>
+    public void LoadByRoute(SceneRoute route)
+    {
+        switch (route)
+        {
+            case SceneRoute.Lobby:
+                GoToStartScreen();
+                break;
+            case SceneRoute.Town:
+                LoadScene(townSceneName);
+                break;
+            case SceneRoute.Dungeon:
+                GoToDungeon();
+                break;
+            default:
+                Debug.LogWarning($"[SceneFlowManager] 지원하지 않는 SceneRoute 입니다: {route}");
+                break;
+        }
+    }
+
     public void LoadScene(string sceneName, string spawnId = "")
     {
         string targetSpawnId = string.IsNullOrWhiteSpace(spawnId) ? GetDefaultSpawnId(sceneName) : spawnId;
         CaptureAndLoadScene(sceneName, targetSpawnId);
     }
 
+    /// <summary>
+    /// 씬 이름/스폰 ID를 확정하고 필요한 경우 현재 플레이어 데이터를 캡처한 뒤 씬을 로드한다.
+    /// 마을 이동 시에는 캡처를 건너뛰고 저장 데이터를 초기화해 초기 상태로 시작한다.
+    /// </summary>
     private void CaptureAndLoadScene(string sceneName, string spawnId)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -113,8 +149,30 @@ public class SceneFlowManager : MonoBehaviour
         }
 
         pendingSpawnId = spawnId;
-        PlayerRuntimeDataManager.Instance.CaptureCurrentPlayerData();
+        if (sceneName == townSceneName)
+        {
+            PrepareForTownTransition();
+            PlayerRuntimeDataManager.Instance.PrepareForFreshSpawnTransition();
+        }
+        else
+        {
+            PlayerRuntimeDataManager.Instance.CaptureCurrentPlayerData();
+        }
         SceneManager.LoadScene(sceneName);
+    }
+
+    /// <summary>
+    /// 마을 이동 전 런타임 장착 아이템 상태를 비워 새 플레이어가 기본 스탯으로 시작하게 한다.
+    /// </summary>
+    private void PrepareForTownTransition()
+    {
+        ItemManager itemManager = FindFirstObjectByType<ItemManager>();
+        if (itemManager == null)
+        {
+            return;
+        }
+
+        itemManager.UnequipAll();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

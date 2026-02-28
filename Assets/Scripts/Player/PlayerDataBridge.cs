@@ -48,6 +48,7 @@ public class PlayerDataBridge : MonoBehaviour
         var runtimeData = PlayerRuntimeDataManager.Instance;
         runtimeData.RegisterCurrentPlayer(playerStats, health, inventory, levelSystem);
         runtimeData.ApplySavedDataToCurrentPlayer();
+        levelSystem.SetLevel(levelSystem.CurrentLevel, levelSystem.CurrentXP);
     }
 
     private void BindItemSystems()

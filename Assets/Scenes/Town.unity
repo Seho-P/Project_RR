@@ -270,6 +270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84186bc5739067245b4e6510d26d8ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SetEffectManager
+  playerStats: {fileID: 0}
 --- !u!1 &114743444
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,8 +390,8 @@ Transform:
   m_GameObject: {fileID: 258602234}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 16.54, y: -14.14, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalPosition: {x: 16.46, y: -15.06, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2092297471}
@@ -444,7 +445,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 4
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 7a4ef86fb4a23c944821725f2a2929ba, type: 3}
+  m_Sprite: {fileID: -1408108427, guid: e0ecb9de4d315854d8c03ba07aa986e9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -488,17 +489,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.53246725}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 3}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 2, y: 3}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2, y: 3.1439087}
+  m_Size: {x: 1.5, y: 1.5}
   m_EdgeRadius: 0
 --- !u!114 &258602238
 MonoBehaviour:
@@ -509,10 +510,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 258602234}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ad145af2343c1448ad57cc2cb5a3ff9, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e33f7e56f7d01b43b8d12d79846a857, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DungeonentranceTrigger
-  dungeonEntrance: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransitionTrigger
+  targetRoute: 2
   interactKey: 101
   playerTag: Player
 --- !u!1 &267006300
@@ -974,7 +975,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5.625
+  orthographic size: 8.4375
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1051,8 +1052,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.PixelPerfectCamera
   m_ComponentVersion: 1
   m_AssetsPPU: 16
-  m_RefResolutionX: 320
-  m_RefResolutionY: 180
+  m_RefResolutionX: 480
+  m_RefResolutionY: 270
   m_CropFrame: 0
   m_GridSnapping: 2
   m_FilterMode: 0
@@ -1073,6 +1074,7 @@ GameObject:
   - component: {fileID: 554780760}
   - component: {fileID: 554780763}
   - component: {fileID: 554780762}
+  - component: {fileID: 554780764}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -1154,8 +1156,8 @@ MonoBehaviour:
   Damping: 2
   SlowingDistance: 5
   OversizeWindow:
-    Enabled: 0
-    MaxWindowSize: 0
+    Enabled: 1
+    MaxWindowSize: 9
     Padding: 0
   m_LegacyMaxWindowSize: -2
 --- !u!114 &554780763
@@ -1189,6 +1191,18 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
+--- !u!114 &554780764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554780758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a8a05de0ac134f4f9d01bef6b9da077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachinePixelPerfect
 --- !u!1 &597418995
 GameObject:
   m_ObjectHideFlags: 0
@@ -27406,7 +27420,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2030273249105571469, guid: 1bff3d2bd59711c428c9eb9b5a47f4df, type: 3}
       propertyPath: xpAmount
-      value: 0
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4075975383103577439, guid: 1bff3d2bd59711c428c9eb9b5a47f4df, type: 3}
       propertyPath: m_LocalPosition.x
@@ -27459,6 +27473,10 @@ PrefabInstance:
     - target: {fileID: 6921566843581828233, guid: 1bff3d2bd59711c428c9eb9b5a47f4df, type: 3}
       propertyPath: m_Name
       value: Slime
+      objectReference: {fileID: 0}
+    - target: {fileID: 6921566843581828233, guid: 1bff3d2bd59711c428c9eb9b5a47f4df, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
