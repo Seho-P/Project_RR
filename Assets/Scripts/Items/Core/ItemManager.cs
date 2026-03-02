@@ -63,6 +63,36 @@ public class ItemManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 씬 전환 후 새 플레이어의 PlayerStats/SetEffectManager를 바인딩하고
+    /// 현재 장착 아이템 효과를 재적용한다.
+    /// </summary>
+    public void BindPlayerStats(PlayerStats newPlayerStats, SetEffectManager newSetEffectManager = null)
+    {
+        if (newPlayerStats == null)
+        {
+            return;
+        }
+
+        playerStats = newPlayerStats;
+
+        if (newSetEffectManager != null)
+        {
+            setEffectManager = newSetEffectManager;
+        }
+        else if (setEffectManager == null)
+        {
+            setEffectManager = newPlayerStats.GetComponent<SetEffectManager>();
+        }
+
+        if (setEffectManager != null)
+        {
+            setEffectManager.BindPlayerStats(playerStats);
+        }
+
+        RebuildStatsFromEquippedItems();
+    }
+
     // 아이템 장착
     public bool EquipItem(ItemInstance item)
     {
@@ -152,55 +182,43 @@ public class ItemManager : MonoBehaviour
     // 아이템 스탯 적용
     private void ApplyItemStats(ItemInstance item)
     {
-        if (playerStats == null || item.ItemData == null) return;
-
-        var stats = item.GetTotalStats();
-        var percentageBonuses = item.GetPercentageBonuses();
-
-        foreach (var kvp in stats)
-        {
-            float percentage = percentageBonuses.ContainsKey(kvp.Key) ? percentageBonuses[kvp.Key] : 0f;
-            playerStats.AddItemStat(kvp.Key, kvp.Value, percentage);
-        }
-
-        // 퍼센트만 있는 옵션도 처리
-        foreach (var kvp in percentageBonuses)
-        {
-            if (!stats.ContainsKey(kvp.Key))
-            {
-                playerStats.AddItemStat(kvp.Key, 0f, kvp.Value);
-            }
-        }
+        if (playerStats == null) return;
+        playerStats.ApplyItem(item);
     }
 
     // 아이템 스탯 제거
     private void RemoveItemStats(ItemInstance item)
     {
-        if (playerStats == null || item.ItemData == null) return;
-
-        var stats = item.GetTotalStats();
-        var percentageBonuses = item.GetPercentageBonuses();
-
-        foreach (var kvp in stats)
-        {
-            float percentage = percentageBonuses.ContainsKey(kvp.Key) ? percentageBonuses[kvp.Key] : 0f;
-            playerStats.RemoveItemStat(kvp.Key, kvp.Value, percentage);
-        }
-
-        // 퍼센트만 있는 옵션도 처리
-        foreach (var kvp in percentageBonuses)
-        {
-            if (!stats.ContainsKey(kvp.Key))
-            {
-                playerStats.RemoveItemStat(kvp.Key, 0f, kvp.Value);
-            }
-        }
+        if (playerStats == null) return;
+        playerStats.RemoveItem(item);
     }
 
     // 장착된 아이템 목록 가져오기
     public List<ItemInstance> GetEquippedItems()
     {
         return new List<ItemInstance>(equippedItems);
+    }
+
+    /// <summary>
+    /// 장착 중인 아이템 목록을 기준으로 PlayerStats를 다시 구성한다.
+    /// </summary>
+    private void RebuildStatsFromEquippedItems()
+    {
+        if (playerStats == null)
+        {
+            return;
+        }
+
+        playerStats.ClearItemStats();
+        playerStats.ClearSetBonusStats();
+
+        for (int i = 0; i < equippedItems.Count; i++)
+        {
+            ApplyItemStats(equippedItems[i]);
+        }
+
+        setEffectManager?.UpdateSetCounts(equippedItems);
+        ItemEvents.InvokeStatsChanged();
     }
 
     // 특정 세트의 장착된 아이템 가져오기

@@ -41,7 +41,7 @@ public class Inventory : MonoBehaviour
         ItemEvents.OnItemEquipped -= HandleItemEquipped;
         ItemEvents.OnItemUnequipped -= HandleItemUnequipped;
     }
-        private void HandleItemEquipped(ItemInstance item, System.Collections.Generic.Dictionary<Items.Enums.StatType, float> statsBefore)
+    private void HandleItemEquipped(ItemInstance item, System.Collections.Generic.Dictionary<Items.Enums.StatType, float> statsBefore)
     {
         // 장착된 아이템을 인벤토리에 추가
         AddItem(item);
@@ -216,6 +216,37 @@ public class Inventory : MonoBehaviour
             if (items[i] != null)
             {
                 RemoveItem(i);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 슬롯 전체(빈 슬롯 포함) 스냅샷을 반환한다.
+    /// </summary>
+    public List<ItemInstance> GetSlotItemsSnapshot()
+    {
+        return new List<ItemInstance>(items);
+    }
+
+    /// <summary>
+    /// 슬롯 전체(빈 슬롯 포함) 스냅샷을 로드한다.
+    /// </summary>
+    public void LoadSlotItemsSnapshot(List<ItemInstance> snapshot)
+    {
+        if (snapshot == null)
+        {
+            return;
+        }
+
+        items = new List<ItemInstance>(maxSlots);
+        for (int i = 0; i < maxSlots; i++)
+        {
+            ItemInstance item = i < snapshot.Count ? snapshot[i] : null;
+            items.Add(item);
+            OnItemChanged?.Invoke(i, item);
+            if (item != null)
+            {
+                OnItemAdded?.Invoke(item, i);
             }
         }
     }

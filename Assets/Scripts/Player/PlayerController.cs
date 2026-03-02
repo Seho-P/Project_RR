@@ -3,6 +3,7 @@ using Items.Enums;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(PlayerDataBridge))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]

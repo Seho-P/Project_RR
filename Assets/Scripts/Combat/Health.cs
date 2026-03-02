@@ -10,6 +10,7 @@ public class Health : MonoBehaviour, IDamageable
     [SerializeField] private bool usePlayerStats = false; // 플레이어인 경우 true로 설정
 
     private PlayerStats playerStats;
+    private bool hasExternalHealthInitialization;
 
     public float CurrentHealth {get; private set;}
     public float MaxHealth 
@@ -48,9 +49,16 @@ public class Health : MonoBehaviour, IDamageable
     private void Start()
     {
         // Start()에서 CurrentHealth 설정 (PlayerStats의 Awake()가 완료된 후)
-        // 이렇게 하면 MaxHealth가 확실히 설정된 상태에서 CurrentHealth를 초기화할 수 있음
+        // 외부에서 복원된 값이 있으면 유지하고, 없으면 최대 체력으로 초기화한다.
         float maxHp = MaxHealth;
-        CurrentHealth = maxHp;
+        if (!hasExternalHealthInitialization)
+        {
+            CurrentHealth = maxHp;
+        }
+        else
+        {
+            CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, maxHp);
+        }
         
         Debug.Log($"Health Start: usePlayerStats={usePlayerStats}, playerStats={playerStats != null}, MaxHealth={maxHp}, CurrentHealth={CurrentHealth}");
         
@@ -97,6 +105,16 @@ public class Health : MonoBehaviour, IDamageable
             else CurrentHealth = 0f;
             
         }
+    }
+
+    /// <summary>
+    /// 씬 전환 후 런타임 데이터로 현재 체력을 복원한다.
+    /// </summary>
+    public void SetCurrentHealthFromData(float healthValue)
+    {
+        hasExternalHealthInitialization = true;
+        CurrentHealth = Mathf.Clamp(healthValue, 0f, MaxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
     }
 }
 

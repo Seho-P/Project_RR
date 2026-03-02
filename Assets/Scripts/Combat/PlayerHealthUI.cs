@@ -11,37 +11,46 @@ public class PlayerHealthUI : MonoBehaviour
 
     private void Start()
     {
-        // Health의 Awake()가 먼저 실행된 후에 UI 초기화
-        // Start()는 Awake() 이후에 실행되므로 Health의 MaxHealth가 이미 설정된 상태
-        InitializeHealthUI();
-    }
-
-    private void InitializeHealthUI()
-    {
+        // 기존 씬 구성과의 호환을 위해 인스펙터 참조가 있으면 그대로 초기화.
+        // 런타임 플레이어 생성 기반에서는 SceneFlowManager가 Bind()를 호출한다.
         if (playerHealth != null)
         {
-            // 초기 UI 설정
-            healthBar.maxValue = playerHealth.MaxHealth;
-            healthBar.value = playerHealth.CurrentHealth;
-
-            healthText.text = playerHealth.CurrentHealth.ToString();
-            maxHealthText.text = playerHealth.MaxHealth.ToString();
-
-            // 이벤트 구독
-            playerHealth.OnHealthChanged += UpdateHPUI;
-        }
-        else
-        {
-            Debug.LogError("PlayerHealthUI: PlayerHealth가 할당되지 않았습니다!");
+            Bind(playerHealth);
         }
     }
 
-    private void OnDestroy()
+    public void Bind(Health health)
     {
         if (playerHealth != null)
         {
             playerHealth.OnHealthChanged -= UpdateHPUI;
         }
+
+        playerHealth = health;
+
+        if (playerHealth == null)
+        {
+            Debug.LogError("PlayerHealthUI: PlayerHealth가 할당되지 않았습니다!");
+            return;
+        }
+
+        // 초기 UI 즉시 갱신
+        UpdateHPUI(playerHealth.CurrentHealth, playerHealth.MaxHealth);
+        playerHealth.OnHealthChanged += UpdateHPUI;
+    }
+
+    public void Unbind()
+    {
+        if (playerHealth != null)
+        {
+            playerHealth.OnHealthChanged -= UpdateHPUI;
+            playerHealth = null;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Unbind();
     }
 
     private void UpdateHPUI(float currentHealth, float maxHealth)

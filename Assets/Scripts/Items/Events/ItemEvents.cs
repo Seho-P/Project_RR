@@ -37,6 +37,11 @@ namespace Items.Events
         OnSetComplete?.Invoke(setName, pieces);
         OnStatsChanged?.Invoke();
     }
+
+    public static void InvokeStatsChanged()
+    {
+        OnStatsChanged?.Invoke();
+    }
     }
 }
 
