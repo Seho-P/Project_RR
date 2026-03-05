@@ -21,6 +21,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float attackCooldown = 0.5f;
     [SerializeField] private WeaponHolder weaponHolder;
     [SerializeField] private HealthBar healthBar;
+    [SerializeField] private EnemySound enemySound;
 
     private Rigidbody2D rb;
     private Transform currentTarget;
@@ -42,6 +43,18 @@ public class EnemyController : MonoBehaviour
     public EnemyIdleState IdleState => idleState;
     public EnemyChaseState ChaseState => chaseState;
     public EnemyAttackState AttackState => attackState;
+
+    private EnemySound EnemySound
+    {
+        get
+        {
+            if (enemySound == null)
+            {
+                enemySound = GetComponent<EnemySound>();
+            }
+            return enemySound;
+        }
+    }
 
     private void Awake()
     {
@@ -77,10 +90,14 @@ public class EnemyController : MonoBehaviour
         ChangeState(idleState);
     }
 
+    /// <summary>
+    /// 현재 상태 Tick과 이동 사운드 갱신을 처리합니다.
+    /// </summary>
     private void Update()
     {
         currentState?.Tick();
         enemyAnimator?.UpdateAnimation(moveDirection);
+        EnemySound?.HandleMove(moveDirection);
     }
 
     private void FixedUpdate()
@@ -178,18 +195,30 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-     public bool TryAttack()
+    /// <summary>
+    /// 현재 타겟을 향해 공격을 시도합니다.
+    /// </summary>
+    public bool TryAttack()
     {
         if (weaponHolder == null || currentTarget == null) return false;
-        weaponHolder.Attack(currentTarget.position);
-        return true;
+        return weaponHolder.TryAttack(currentTarget.position);
     }
 
+    /// <summary>
+    /// 공격 효과음을 재생합니다.
+    /// </summary>
+    public void PlayAttackSound()
+    {
+        EnemySound?.PlayAttack();
+    }
+
+    /// <summary>
+    /// 지정 위치를 향해 공격을 시도합니다.
+    /// </summary>
     public bool TryAttackAtPosition(Vector2 targetPosition)
     {
         if (weaponHolder == null) return false;
-        weaponHolder.Attack(targetPosition);
-        return true;
+        return weaponHolder.TryAttack(targetPosition);
     }
 
     // 코루틴 실행을 위한 헬퍼 메서드
