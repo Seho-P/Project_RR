@@ -165,11 +165,7 @@ public class HUDRootPersistence : MonoBehaviour
             playerHealthUI.Bind(playerHealth);
         }
 
-        GameOverUI gameOverUI = FindFirstObjectByType<GameOverUI>();
-        if (gameOverUI != null)
-        {
-            gameOverUI.Bind(playerHealth);
-        }
+        UIManager.Instance.BindPlayerDeath(playerHealth);
     }
 
     private void UnbindHud()
@@ -180,11 +176,7 @@ public class HUDRootPersistence : MonoBehaviour
             playerHealthUI.Unbind();
         }
 
-        GameOverUI gameOverUI = FindFirstObjectByType<GameOverUI>();
-        if (gameOverUI != null)
-        {
-            gameOverUI.Unbind();
-        }
+        UIManager.Instance.UnbindPlayerDeath();
     }
 
     private void CacheVisualComponents()
