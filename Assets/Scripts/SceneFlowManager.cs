@@ -271,11 +271,7 @@ public class SceneFlowManager : MonoBehaviour
             playerHealthUI.Bind(playerHealth);
         }
 
-        GameOverUI gameOverUI = FindFirstObjectByType<GameOverUI>();
-        if (gameOverUI != null)
-        {
-            gameOverUI.Bind(playerHealth);
-        }
+        UIManager.Instance.BindPlayerDeath(playerHealth);
     }
 
     private bool TryGetSpawnPoint(string sceneName, string preferredSpawnId, out PlayerSpawnPoint point)
