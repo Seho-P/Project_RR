@@ -1,72 +1,47 @@
 using UnityEngine;
-using System;
 
 public class GameOverUI : MonoBehaviour
 {
     [SerializeField] private GameObject gameOverUI;
-    [SerializeField] private Health playerHealth;
 
+    /// <summary>
+    /// 시작 시 패널을 숨기고 UIManager에 등록한다.
+    /// </summary>
     private void Start()
     {
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(false);
-        }
-
-        if (playerHealth != null)
-        {
-            Bind(playerHealth);
-        }
+        UIManager.Instance.RegisterDeathPanel(gameOverUI);
+        Hide();
     }
 
-    private void OnDestroy()
-    {
-        Unbind();
-    }
-
-    public void Bind(Health health)
-    {
-        if (playerHealth != null)
-        {
-            playerHealth.OnDeath -= ShowGameOverUI;
-        }
-
-        playerHealth = health;
-
-        if (playerHealth == null)
-        {
-            return;
-        }
-
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(false);
-        }
-
-        playerHealth.OnDeath += ShowGameOverUI;
-    }
-
-    public void Unbind()
-    {
-        if (playerHealth != null)
-        {
-            playerHealth.OnDeath -= ShowGameOverUI;
-            playerHealth = null;
-        }
-
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(false);
-        }
-    }
-
-    private void ShowGameOverUI()
+    /// <summary>
+    /// 게임오버 패널을 표시한다.
+    /// </summary>
+    public void Show()
     {
         if (gameOverUI != null)
         {
             gameOverUI.SetActive(true);
         }
+    }
 
-        Time.timeScale = 0f;
+    /// <summary>
+    /// 게임오버 패널을 숨긴다.
+    /// </summary>
+    public void Hide()
+    {
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Town 버튼 클릭 시 시간을 재개하고 마을로 이동한다.
+    /// </summary>
+    public void OnClickTownButton()
+    {
+        Time.timeScale = 1f;
+        Hide();
+        SceneFlowManager.Instance.ReturnToTown();
     }
 }

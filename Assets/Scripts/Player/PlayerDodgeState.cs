@@ -13,6 +13,9 @@ public class PlayerDodgeState : PlayerState
     {
     }
 
+    /// <summary>
+    /// 회피 방향을 계산하고 회피 코루틴을 시작합니다.
+    /// </summary>
     public override void Enter()
     {
         // 회피 방향 결정
@@ -39,6 +42,7 @@ public class PlayerDodgeState : PlayerState
 
         // 회피 방향에 맞게 애니메이션 업데이트 (스프라이트 Flip 포함)
         controller.UpdateAnimation(dodgeDirection);
+        controller.PlayDodgeSound();
 
         // 회피 코루틴 시작
         dodgeCoroutine = controller.StartCoroutine(PerformDodge());

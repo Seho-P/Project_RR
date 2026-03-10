@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private WeaponHolder weaponHolder;
     [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerSound playerSound;
 
     private Rigidbody2D rb;
     private Collider2D playerCollider;
@@ -53,6 +54,18 @@ public class PlayerController : MonoBehaviour
     public PlayerIdleState IdleState => idleState;
     public PlayerMoveState MoveState => moveState;
     public PlayerDodgeState DodgeState => dodgeState;
+
+    private PlayerSound PlayerSound
+    {
+        get
+        {
+            if (playerSound == null)
+            {
+                playerSound = GetComponent<PlayerSound>();
+            }
+            return playerSound;
+        }
+    }
 
     private void Awake()
     {
@@ -133,6 +146,30 @@ public class PlayerController : MonoBehaviour
     public void SetMoveDirection(Vector2 direction)
     {
         moveDirection = direction;
+    }
+
+    /// <summary>
+    /// 이동 입력에 따라 발소리를 갱신합니다.
+    /// </summary>
+    public void UpdateMoveSound(Vector2 moveInput)
+    {
+        PlayerSound?.HandleMove(moveInput);
+    }
+
+    /// <summary>
+    /// 공격 효과음을 재생합니다.
+    /// </summary>
+    public void PlayAttackSound()
+    {
+        PlayerSound?.PlayAttack();
+    }
+
+    /// <summary>
+    /// 회피 효과음을 재생합니다.
+    /// </summary>
+    public void PlayDodgeSound()
+    {
+        PlayerSound?.PlayDodge();
     }
 
     /// <summary>

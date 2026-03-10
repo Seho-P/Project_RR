@@ -106,15 +106,27 @@ public class WeaponHolder : MonoBehaviour
         EquipWeapon(weapon);
     }
 
-    public void Attack(Vector2 targetWorld)
+    /// <summary>
+    /// 현재 무기로 공격을 시도하고 성공 여부를 반환합니다.
+    /// </summary>
+    public bool TryAttack(Vector2 targetWorld)
     {
-        if (!IsWeaponAlive(currentWeapon)) return;
-        if (!currentWeapon.CanAttack()) return;
+        if (!IsWeaponAlive(currentWeapon)) return false;
+        if (!currentWeapon.CanAttack()) return false;
         if (animator != null)
         {
             animator.SetTrigger("Attack");
         }
         currentWeapon.Attack(targetWorld);
+        return true;
+    }
+
+    /// <summary>
+    /// 현재 무기로 공격을 실행합니다.
+    /// </summary>
+    public void Attack(Vector2 targetWorld)
+    {
+        TryAttack(targetWorld);
     }
 
     // Animation Event에서 호출할 수 있는 공통 훅

@@ -36,6 +36,9 @@ public class EnemyAttackState : EnemyState
         }
     }
 
+    /// <summary>
+    /// 선딜레이 후 공격을 실행하고 쿨타임 상태로 전환합니다.
+    /// </summary>
     private IEnumerator AttackAfterDelay()
     {
         // 0.2초 대기
@@ -44,9 +47,12 @@ public class EnemyAttackState : EnemyState
         // 공격 실행 (타겟이 도망가도 마지막 위치로 공격)
         if (controller.HasTarget)
         {
-            controller.TryAttack();
-            hasAttacked = true;
-            isInCooldown = true;
+            if (controller.TryAttack())
+            {
+                controller.PlayAttackSound();
+                hasAttacked = true;
+                isInCooldown = true;
+            }
         }
     }
 

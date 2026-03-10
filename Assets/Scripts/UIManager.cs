@@ -29,13 +29,19 @@ public class UIManager : MonoBehaviour
 
     [Header("UI Canvas")]
     [SerializeField] private Canvas uiCanvas; // UI가 표시될 캔버스
+    [Header("Death UI")]
+    [SerializeField] private GameObject deathPanel; // 사망 시 표시할 패널
 
     // 인벤토리 UI 캐싱
     private InventoryUI cachedInventoryUI;
     private GameObject cachedInventoryGameObject;
     // 레벨업 오버레이 캐싱
     private GameObject levelUpOverlay;
+    private Health boundPlayerHealth;
 
+    /// <summary>
+    /// 싱글톤/Canvas 초기화 및 이벤트 구독을 수행한다.
+    /// </summary>
     private void Awake()
     {
         if (instance == null)
@@ -267,6 +273,70 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 사망 패널 오브젝트를 등록하고 기본 상태를 숨김으로 맞춘다.
+    /// </summary>
+    public void RegisterDeathPanel(GameObject panel)
+    {
+        deathPanel = panel;
+        if (deathPanel != null)
+        {
+            deathPanel.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 플레이어 Health 사망 이벤트를 UIManager에 바인딩한다.
+    /// </summary>
+    public void BindPlayerDeath(Health playerHealth)
+    {
+        UnbindPlayerDeath();
+
+        boundPlayerHealth = playerHealth;
+        if (boundPlayerHealth == null)
+        {
+            return;
+        }
+
+        if (deathPanel != null)
+        {
+            deathPanel.GetComponent<GameOverUI>().Hide();
+        }
+
+        boundPlayerHealth.OnDeath += HandlePlayerDeath;
+    }
+
+    /// <summary>
+    /// 플레이어 Health 사망 이벤트 바인딩을 해제한다.
+    /// </summary>
+    public void UnbindPlayerDeath()
+    {
+        if (boundPlayerHealth != null)
+        {
+            boundPlayerHealth.OnDeath -= HandlePlayerDeath;
+            boundPlayerHealth = null;
+        }
+
+        if (deathPanel != null)
+        {
+            deathPanel.GetComponent<GameOverUI>().Hide();
+        }
+    }
+
+    /// <summary>
+    /// 플레이어 사망 이벤트를 받아 Death 패널을 표시한다.
+    /// </summary>
+    private void HandlePlayerDeath()
+    {
+        if (deathPanel != null)
+        {
+            deathPanel.GetComponent<GameOverUI>().Show();
+            Debug.Log("GameOverUI Show");
+        }
+
+        Time.timeScale = 0f;
+    }
+
+    /// <summary>
     /// 레벨업 오버레이 생성 (반투명 검은 배경)
     /// </summary>
     private GameObject CreateLevelUpOverlay()
@@ -336,11 +406,16 @@ public class UIManager : MonoBehaviour
         levelUpOverlay.SetActive(false);
     }
 
+    /// <summary>
+    /// UIManager 파괴 시 구독/캐시 리소스를 정리한다.
+    /// </summary>
     private void OnDestroy()
     {
         // UIManager가 파괴될 때 인벤토리 캐시 해제
+        UnbindPlayerDeath();
         ReleaseInventoryUI();
         RemoveLevelUpOverlay();
+        PlayerLevelEvents.OnLevelUp -= HandleLevelUp;
     }
 
     // 프로퍼티

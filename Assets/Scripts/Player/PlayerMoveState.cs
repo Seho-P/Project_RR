@@ -6,6 +6,9 @@ public class PlayerMoveState : PlayerState
     {
     }
 
+    /// <summary>
+    /// 이동 상태 입력을 처리하고 공격/회피를 실행합니다.
+    /// </summary>
     public override void Tick()
     {
         // 이동 입력 처리
@@ -13,6 +16,7 @@ public class PlayerMoveState : PlayerState
         float y = Input.GetAxisRaw("Vertical");
         Vector2 moveInput = new Vector2(x, y).normalized;
         controller.SetMoveDirection(moveInput);
+        controller.UpdateMoveSound(moveInput);
 
         // 애니메이션 업데이트 (방향 + Speed + 스프라이트 Flip)
         controller.UpdateAnimation(moveInput);
@@ -35,7 +39,10 @@ public class PlayerMoveState : PlayerState
         if (Input.GetMouseButtonDown(0) && controller.WeaponHolder != null)
         {
             Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            controller.WeaponHolder.Attack(mouseWorld);
+            if (controller.WeaponHolder.TryAttack(mouseWorld))
+            {
+                controller.PlayAttackSound();
+            }
         }
     }
 }
